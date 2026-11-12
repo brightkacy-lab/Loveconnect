@@ -45,16 +45,59 @@ small{color:#777}
 <span>📍 Nearby</span>
 <span>💌 Likes</span>
 <span>👤 Profile</span>
-</nav>
+<script 
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-function register(){
-document.getElementById('message').textContent=
-'Account registration will be connected to Supabase in the next setup step.';
+const db = window.supabase.createClient(
+  "https://bdwbkbbwrhdiaurqxlfk.supabase.co",
+  "sb_publishable_LX0TxYKI521RS_qG0YFNOg_P568uSUp"
+);
+
+async function register() {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const message = document.getElementById("message");
+
+  if (!name || !email || !password) {
+    message.textContent = "Please fill in all fields.";
+    return;
+  }
+
+  message.textContent = "Creating your account...";
+
+  const { data, error } = await db.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: name }
+    }
+  });
+
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
+
+  message.textContent = data.session
+    ? "Account created! Welcome to LoveConnect."
+    : "Account created! Please check your email to confirm your account.";
 }
-function login(){
-document.getElementById('message').textContent=
-'Login will be connected to Supabase in the next setup step.';
+
+async function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const message = document.getElementById("message");
+
+  const { error } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  message.textContent = error
+    ? error.message
+    : "Welcome back to LoveConnect!";
 }
-</script>
+                                                     </script>
 </body>
 </html>
