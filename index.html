@@ -30,6 +30,15 @@ small{color:#777}
 <p>Meet people. Make connections.</p>
 </header>
 
+<div class="card" id="discoverCard">
+<h2>❤️ Discover Singles</h2>
+<p>Meet other members of LoveConnect.</p>
+<button onclick="loadDiscover()">Find People</button>
+<div id="discoverList">
+<p>Tap Find People to discover members.</p>
+</div>
+</div>
+
 <main>
 <div class="card" id="authCard">
 <h2>Welcome to LoveConnect</h2>
@@ -206,6 +215,60 @@ currentUser = null;
 document.getElementById("profileCard").style.display = "none";
 document.getElementById("authCard").style.display = "block";
 document.getElementById("profileMessage").textContent = "";
+}
+
+async function loadDiscover() {
+  const list = document.getElementById("discoverList");
+
+  if (!currentUser) {
+    list.textContent = "Please log in first.";
+    return;
+  }
+
+  list.textContent = "Finding members...";
+
+  const { data, error } = await db
+    .from("profiles")
+    .select("id, full_name, age, gender, location, bio, interests")
+    .neq("id", currentUser.id)
+    .limit(20);
+
+  if (error) {
+    list.textContent = "Error: " + error.message;
+    return;
+  }
+
+  list.replaceChildren();
+
+  if (!data || data.length === 0) {
+    list.textContent = "No other members yet. Invite friends to join LoveConnect!";
+    return;
+  }
+
+  data.forEach(person => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const name = document.createElement("h3");
+    name.textContent = person.full_name || "LoveConnect Member";
+
+    const details = document.createElement("p");
+    details.textContent =
+      (person.age ? person.age + " years old" : "Age not added") +
+      " • " + (person.gender || "Gender not added");
+
+    const location = document.createElement("p");
+    location.textContent = "📍 " + (person.location || "Location not added");
+
+    const bio = document.createElement("p");
+    bio.textContent = person.bio || "No bio added yet.";
+
+    const interests = document.createElement("p");
+    interests.textContent = "Interests: " + (person.interests || []).join(", ");
+
+    card.append(name, details, location, bio, interests);
+    list.appendChild(card);
+  });
 }
 
 async function checkLogin() {
