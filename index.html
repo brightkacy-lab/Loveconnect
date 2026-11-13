@@ -77,6 +77,13 @@ small{color:#777}
 <button class="secondary" onclick="logout()">Log Out</button>
 <p id="profileMessage"></p>
 </div>
+  <div class="card" id="chatCard" style="display:none">
+  <h2 id="chatTitle">💬 Private Chat</h2>
+  <div id="chatMessages"></div>
+  <textarea id="chatInput" placeholder="Write a message..."></textarea>
+  <button onclick="sendMessage()">Send Message ❤️</button>
+  <button class="secondary" onclick="loadMatches()">Back to Matches</button>
+  </div>
 </main>
 
 <nav>
@@ -358,6 +365,130 @@ async function loadLikes() {
     list.appendChild(card);
   }
  } 
+  async function loadMatches() {
+  const list = document.getElementById("discoverList");
+
+  if (!currentUser) {
+    list.textContent = "Please log in first.";
+    return;
+  }
+
+  list.textContent = "Loading your matches...";
+
+  const { data, error } = await db
+    .from("matches")
+    .select("*")
+    .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`);
+
+  if (error) {
+    list.textContent = "Error: " + error.message;
+    return;
+  }
+
+  list.replaceChildren();
+
+  if (!data || data.length === 0) {
+    list.textContent = "No matches yet. Keep discovering! ❤️";
+    return;
+  }
+
+  for (const match of data) {
+    const otherId =
+      match.user1_id === currentUser.id
+        ? match.user2_id
+        : match.user1_id;
+
+    const { data: person } = await db
+      .from("profiles")
+      .select("full_name")
+      .eq("id", otherId)
+      .maybeSingle();
+
+    if (!person) continue;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const name = document.createElement("h3");
+    name.textContent = "❤️ " + person.full_name;
+
+    const chatButton = document.createElement("button");
+    chatButton.textContent = "Open Chat";
+    chatButton.onclick = () => openChat(match.id, person.full_name);
+
+    card.append(name, chatButton);
+    list.appendChild(card);
+  }
+  }
+  let currentMatchId = null;
+
+async function openChat(matchId, personName) {
+  currentMatchId = matchId;
+
+  document.getElementById("profileCard").style.display = "none";
+  document.getElementById("authCard").style.display = "none";
+  document.getElementById("chatCard").style.display = "block";
+
+  document.getElementById("chatTitle").textContent =
+    "💬 Chat with " + personName;
+
+  await loadMessages();
+}
+
+async function loadMessages() {
+  const box = document.getElementById("chatMessages");
+
+  box.textContent = "Loading messages...";
+
+  const { data, error } = await db
+    .from("messages")
+    .select("*")
+    .eq("match_id", currentMatchId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    box.textContent = "Error: " + error.message;
+    return;
+  }
+
+  box.replaceChildren();
+
+  if (!data || data.length === 0) {
+    box.textContent = "Say hello! ❤️";
+    return;
+  }
+
+  data.forEach(message => {
+    const item = document.createElement("p");
+
+    item.textContent =
+      (message.sender_id === currentUser.id ? "You: " : "Them: ") +
+      message.content;
+
+    box.appendChild(item);
+  });
+}
+
+async function sendMessage() {
+  const input = document.getElementById("chatInput");
+  const content = input.value.trim();
+
+  if (!content || !currentMatchId) return;
+
+  const { error } = await db.from("messages").insert({
+    match_id: currentMatchId,
+    sender_id: currentUser.id,
+    content: content
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  input.value = "";
+  await loadMessages();
+}
 async function checkLogin() {
 const {data} = await db.auth.getSession();
 if(data.session){
