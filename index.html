@@ -34,6 +34,7 @@ small{color:#777}
 <h2>❤️ Discover Singles</h2>
 <p>Meet other members of LoveConnect.</p>
 <button onclick="loadDiscover()">Find People</button>
+<button onclick="loadLikes()">💌 Who Liked Me</button>
 <div id="discoverList">
 <p>Tap Find People to discover members.</p>
 </div>
@@ -301,7 +302,61 @@ async function likePerson(personId, button) {
   }
 
   button.textContent = "Liked ❤️";
+  } 
+ async function loadLikes() {
+  const list = document.getElementById("discoverList");
+
+  if (!currentUser) {
+    list.textContent = "Please log in first.";
+    return;
   }
+
+  list.textContent = "Checking your likes...";
+
+  const { data, error } = await db
+    .from("likes")
+    .select("liker_id")
+    .eq("liked_id", currentUser.id);
+
+  if (error) {
+    list.textContent = "Error: " + error.message;
+    return;
+  }
+
+  list.replaceChildren();
+
+  if (!data || data.length === 0) {
+    list.textContent = "Nobody has liked you yet. ❤️";
+    return;
+  }
+
+  for (const like of data) {
+    const { data: person, error: profileError } = await db
+      .from("profiles")
+      .select("full_name, age, location, bio")
+      .eq("id", like.liker_id)
+      .maybeSingle();
+
+    if (profileError || !person) continue;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const name = document.createElement("h3");
+    name.textContent = person.full_name || "LoveConnect Member";
+
+    const details = document.createElement("p");
+    details.textContent =
+      (person.age ? person.age + " years old" : "") +
+      " • " + (person.location || "Location not added");
+
+    const bio = document.createElement("p");
+    bio.textContent = person.bio || "No bio added yet.";
+
+    card.append(name, details, bio);
+    list.appendChild(card);
+  }
+ } 
 async function checkLogin() {
 const {data} = await db.auth.getSession();
 if(data.session){
