@@ -301,9 +301,10 @@ async function likePerson(personId, button) {
     return;
   }
 
-  button.textContent = "Liked ❤️";
-  } 
- async function loadLikes() {
+    button.textContent = "Liked ❤️";
+}
+
+async function loadLikes() {
   const list = document.getElementById("discoverList");
 
   if (!currentUser) {
