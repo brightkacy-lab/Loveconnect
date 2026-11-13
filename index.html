@@ -266,11 +266,42 @@ async function loadDiscover() {
     const interests = document.createElement("p");
     interests.textContent = "Interests: " + (person.interests || []).join(", ");
 
-    card.append(name, details, location, bio, interests);
+    const likeButton = document.createElement("button");
+likeButton.textContent = "❤️ Like";
+likeButton.onclick = () => likePerson(person.id, likeButton);
+
+card.append(name, details, location, bio, interests, likeButton););
     list.appendChild(card);
   });
 }
+async function likePerson(personId, button) {
+  if (!currentUser) {
+    alert("Please log in first.");
+    return;
+  }
 
+  button.disabled = true;
+  button.textContent = "Sending...";
+
+  const { error } = await db.from("likes").insert({
+    liker_id: currentUser.id,
+    liked_id: personId
+  });
+
+  if (error) {
+    button.textContent = error.code === "23505"
+      ? "Already Liked ❤️"
+      : "Try Again";
+
+    if (error.code !== "23505") {
+      alert(error.message);
+      button.disabled = false;
+    }
+    return;
+  }
+
+  button.textContent = "Liked ❤️";
+  }
 async function checkLogin() {
 const {data} = await db.auth.getSession();
 if(data.session){
