@@ -22,11 +22,13 @@ nav span{color:#e83e70;font-size:13px}
 small{color:#777}
 #profileCard{display:none}
 
-  #chatMessages {
+#chatMessages {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 12px 0;
+  max-height: 350px;
+  overflow-y: auto;
 }
 
 .message-bubble {
@@ -444,82 +446,238 @@ async function loadLikes() {
     chatButton.textContent = "Open Chat";
     chatButton.onclick = () => openChat(match.id, person.full_name);
 
-    card.append(name, chatButton);
+        card.append(name, chatButton);
     list.appendChild(card);
   }
-  }
-  let currentMatchId = null;
+}
+
+let currentMatchId = null;
+let messageRefreshTimer = null;
+let loadingMessages = false;
+let lastMessagesSnapshot = "";
 
 async function openChat(matchId, personName) {
   currentMatchId = matchId;
+  lastMessagesSnapshot = "";
+
+  if (messageRefreshTimer) {
+    clearInterval(messageRefreshTimer);
+    messageRefreshTimer = null;
+  }
 
   document.getElementById("profileCard").style.display = "none";
   document.getElementById("authCard").style.display = "none";
+  document.getElementById("discoverCard").style.display = "none";
   document.getElementById("chatCard").style.display = "block";
 
   document.getElementById("chatTitle").textContent =
     "💬 Chat with " + personName;
 
+  const input = document.getElementById("chatInput");
+
+  input.onkeydown = function(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const backButton = document.querySelector(
+    "#chatCard .secondary"
+  );
+
+  backButton.onclick = async function() {
+    if (messageRefreshTimer) {
+      clearInterval(messageRefreshTimer);
+      messageRefreshTimer = null;
+    }
+
+    document.getElementById("chatCard").style.display = "none";
+    document.getElementById("discoverCard").style.display = "block";
+
+    await loadMatches();
+  };
+
   await loadMessages();
+
+  messageRefreshTimer = setInterval(function() {
+    loadMessages();
+  }, 5000);
 }
 
 async function loadMessages() {
+  if (!currentUser || !currentMatchId || loadingMessages) return;
+
+  loadingMessages = true;
+
   const box = document.getElementById("chatMessages");
+  const thisMatchId = currentMatchId;
 
-  box.textContent = "Loading messages...";
+  try {
+    const { data, error } = await db
+      .from("messages")
+      .select("*")
+      .eq("match_id", thisMatchId)
+      .order("created_at", { ascending: true });
 
-  const { data, error } = await db
-    .from("messages")
-    .select("*")
-    .eq("match_id", currentMatchId)
-    .order("created_at", { ascending: true });
+    if (thisMatchId !== currentMatchId) return;
 
-  if (error) {
-    box.textContent = "Error: " + error.message;
-    return;
+    if (error) {
+      if (!box.children.length) {
+        box.textContent = "Unable to load messages: " + error.message;
+      }
+      return;
+    }
+
+    const snapshot = JSON.stringify(data || []);
+
+    if (snapshot === lastMessagesSnapshot) return;
+
+    lastMessagesSnapshot = snapshot;
+    box.replaceChildren();
+
+    if (!data || data.length === 0) {
+      box.textContent = "Say hello! ❤️";
+      return;
+    }
+
+    let previousDate = "";
+
+    data.forEach(function(message) {
+      const messageDate = new Date(message.created_at);
+
+      const dateKey = [
+        messageDate.getFullYear(),
+        messageDate.getMonth(),
+        messageDate.getDate()
+      ].join("-");
+
+      if (dateKey !== previousDate) {
+        const divider = document.createElement("div");
+        divider.className = "chat-date-divider";
+
+        const today = new Date();
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+
+        function sameDay(a, b) {
+          return a.getFullYear() === b.getFullYear() &&
+            a.getMonth() === b.getMonth() &&
+            a.getDate() === b.getDate();
+        }
+
+        let dateLabel;
+
+        if (sameDay(messageDate, today)) {
+          dateLabel = "Today";
+        } else if (sameDay(messageDate, yesterday)) {
+          dateLabel = "Yesterday";
+        } else {
+          dateLabel = messageDate.toLocaleDateString(
+            "en-NG",
+            {
+              day: "numeric",
+              month: "long",
+              year: "numeric"
+            }
+          );
+        }
+
+        divider.textContent = dateLabel;
+        divider.style.textAlign = "center";
+        divider.style.margin = "15px auto";
+        divider.style.padding = "6px 14px";
+        divider.style.background = "#fce0e9";
+        divider.style.borderRadius = "15px";
+        divider.style.fontSize = "12px";
+        divider.style.color = "#704653";
+        divider.style.width = "fit-content";
+
+        box.appendChild(divider);
+        previousDate = dateKey;
+      }
+
+      const item = document.createElement("div");
+
+      item.className =
+        message.sender_id === currentUser.id
+          ? "message-bubble my-message"
+          : "message-bubble their-message";
+
+      const messageText = document.createElement("div");
+      messageText.textContent = message.content;
+
+      const messageTime = document.createElement("small");
+
+      messageTime.textContent = messageDate.toLocaleTimeString(
+        "en-NG",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true
+        }
+      );
+
+      messageTime.style.display = "block";
+      messageTime.style.fontSize = "10px";
+      messageTime.style.marginTop = "6px";
+      messageTime.style.color = "#777";
+      messageTime.style.textAlign = "right";
+
+      item.append(messageText, messageTime);
+      box.appendChild(item);
+    });
+
+    box.scrollTop = box.scrollHeight;
+
+  } catch (error) {
+    console.error("Message loading error:", error);
+  } finally {
+    loadingMessages = false;
   }
-
-  box.replaceChildren();
-
-  if (!data || data.length === 0) {
-    box.textContent = "Say hello! ❤️";
-    return;
-  }
-
-  data.forEach(message => {
-  const item = document.createElement("div");
-
-  item.className =
-    message.sender_id === currentUser.id
-      ? "message-bubble my-message"
-      : "message-bubble their-message";
-
-  item.textContent = message.content;
-
-  box.appendChild(item);
-});
 }
 
 async function sendMessage() {
   const input = document.getElementById("chatInput");
   const content = input.value.trim();
 
-  if (!content || !currentMatchId) return;
+  if (!content || !currentMatchId || !currentUser) return;
 
-  const { error } = await db.from("messages").insert({
-    match_id: currentMatchId,
-    sender_id: currentUser.id,
-    content: content
-  });
+  const sendButton = document.querySelector(
+    "#chatCard button:not(.secondary)"
+  );
 
-  if (error) {
-    alert(error.message);
-    return;
+  if (sendButton) {
+    sendButton.disabled = true;
+    sendButton.textContent = "Sending...";
   }
 
-  input.value = "";
-  await loadMessages();
+  try {
+    const { error } = await db.from("messages").insert({
+      match_id: currentMatchId,
+      sender_id: currentUser.id,
+      content: content
+    });
+
+    if (error) {
+      alert("Message not sent: " + error.message);
+      return;
+    }
+
+    input.value = "";
+    lastMessagesSnapshot = "";
+    await loadMessages();
+
+  } catch (error) {
+    alert("Something went wrong. Please try again.");
+  } finally {
+    if (sendButton) {
+      sendButton.disabled = false;
+      sendButton.textContent = "Send Message ❤️";
+    }
+  }
 }
+
 async function checkLogin() {
 const {data} = await db.auth.getSession();
 if(data.session){
