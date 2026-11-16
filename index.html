@@ -322,10 +322,20 @@ async function loadDiscover() {
     list.textContent = "No other members yet. Invite friends to join LoveConnect!";
     return;
   }
-
-  data.forEach(person => {
+data.forEach(person => {
     const card = document.createElement("div");
     card.className = "card";
+
+    if (person.avatar_url) {
+      const photo = document.createElement("img");
+      photo.src = person.avatar_url;
+      photo.alt = person.full_name || "Profile photo";
+      photo.style.width = "100%";
+      photo.style.maxHeight = "260px";
+      photo.style.objectFit = "cover";
+      photo.style.borderRadius = "12px";
+      card.appendChild(photo);
+    }
 
     const name = document.createElement("h3");
     name.textContent = person.full_name || "LoveConnect Member";
@@ -411,7 +421,7 @@ async function loadLikes() {
   for (const like of data) {
     const { data: person, error: profileError } = await db
       .from("profiles")
-      .select("full_name, age, location, bio")
+      .select("full_name, age, location, bio, avatar_url")
       .eq("id", like.liker_id)
       .maybeSingle();
 
@@ -419,6 +429,17 @@ async function loadLikes() {
 
     const card = document.createElement("div");
     card.className = "card";
+
+    if (person.avatar_url) {
+      const photo = document.createElement("img");
+      photo.src = person.avatar_url;
+      photo.alt = person.full_name || "Profile photo";
+      photo.style.width = "100%";
+      photo.style.maxHeight = "260px";
+      photo.style.objectFit = "cover";
+      photo.style.borderRadius = "12px";
+      card.appendChild(photo);
+    }
 
     const name = document.createElement("h3");
     name.textContent = person.full_name || "LoveConnect Member";
