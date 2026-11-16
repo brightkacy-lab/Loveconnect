@@ -21,6 +21,33 @@ nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify
 nav span{color:#e83e70;font-size:13px}
 small{color:#777}
 #profileCard{display:none}
+
+  #chatMessages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.message-bubble {
+  max-width: 80%;
+  padding: 12px 15px;
+  border-radius: 16px;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.my-message {
+  align-self: flex-end;
+  background: #fce0e9;
+  border-bottom-right-radius: 4px;
+}
+
+.their-message {
+  align-self: flex-start;
+  background: #eeeeee;
+  border-bottom-left-radius: 4px;
+}
 </style>
 </head>
 <body>
@@ -460,12 +487,17 @@ async function loadMessages() {
   }
 
   data.forEach(message => {
-    const item = document.createElement("p");
+  const item = document.createElement("div");
 
-      item.textContent = message.content;
+  item.className =
+    message.sender_id === currentUser.id
+      ? "message-bubble my-message"
+      : "message-bubble their-message";
 
-    box.appendChild(item);
-  });
+  item.textContent = message.content;
+
+  box.appendChild(item);
+});
 }
 
 async function sendMessage() {
