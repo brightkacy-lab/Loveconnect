@@ -90,6 +90,7 @@ small{color:#777}
 <p>Tell other members about yourself.</p>
 
 <input id="fullName" placeholder="Full name">
+<input id="avatar" type="file" accept="image/*">
 <input id="age" type="number" placeholder="Your age">
 
 <select id="gender">
@@ -231,7 +232,46 @@ const interests = document.getElementById("interests").value
 .split(",")
 .map(item => item.trim())
 .filter(Boolean);
+// Keep the existing photo if no new photo is selected
+const { data: oldProfile } = await db
+  .from("profiles")
+  .select("avatar_url")
+  .eq("id", currentUser.id)
+  .maybeSingle();
 
+let avatarUrl = oldProfile?.avatar_url || null;
+
+const photoFile = document.getElementById("avatar").files[0];
+
+if (photoFile) {
+  if (!photoFile.type.startsWith("image/")) {
+    message.textContent = "Please select an image.";
+    return;
+  }
+
+  if (photoFile.size > 5 * 1024 * 1024) {
+    message.textContent = "Photo must be 5MB or smaller.";
+    return;
+  }
+
+  const extension = photoFile.name.split(".").pop().toLowerCase();
+  const filePath = currentUser.id + "/" + Date.now() + "." + extension;
+
+  const { error: uploadError } = await db.storage
+    .from("profile-photos")
+    .upload(filePath, photoFile);
+
+  if (uploadError) {
+    message.textContent = "Photo upload failed: " + uploadError.message;
+    return;
+  }
+
+  const { data: publicData } = db.storage
+    .from("profile-photos")
+    .getPublicUrl(filePath);
+
+  avatarUrl = publicData.publicUrl;
+  }
 const {error} = await db.from("profiles").upsert({
 id:currentUser.id,
 full_name:fullName,
@@ -239,9 +279,9 @@ age:age,
 gender:document.getElementById("gender").value || null,
 location:document.getElementById("location").value.trim() || null,
 bio:document.getElementById("bio").value.trim() || null,
-interests:interests
+interests:interests,
+avatar_url:avatarUrl
 },{onConflict:"id"});
-
 message.textContent = error
 ? "Error: " + error.message
 : "Your profile has been saved successfully! ❤️";
@@ -267,7 +307,7 @@ async function loadDiscover() {
 
   const { data, error } = await db
     .from("profiles")
-    .select("id, full_name, age, gender, location, bio, interests")
+    .select("id, full_name, age, gender, location, bio, interests, avatar_url")
     .neq("id", currentUser.id)
     .limit(20);
 
