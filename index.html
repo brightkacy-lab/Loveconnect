@@ -182,6 +182,11 @@ small{color:#777}
 <h2>👤 My Profile</h2>
 <p>Edit your details and keep your profile updated.</p>
 
+<img id="myProfilePhoto"
+class="profile-photo"
+style="display:none"
+alt="My profile picture">
+
 <input id="fullName" placeholder="Full name">
 <input id="avatar" type="file" accept="image/*">
 <input id="age" type="number" placeholder="Your age">
@@ -342,6 +347,7 @@ async function login(){
  await startPresence();
 }
 
+
 async function showProfile(){
  showOnly("profileCard");
  setActiveNav("navProfile");
@@ -356,6 +362,8 @@ async function showProfile(){
   return;
  }
 
+ const photo=document.getElementById("myProfilePhoto");
+
  if(data){
   document.getElementById("fullName").value=data.full_name||"";
   document.getElementById("age").value=data.age||"";
@@ -363,8 +371,19 @@ async function showProfile(){
   document.getElementById("location").value=data.location||"";
   document.getElementById("bio").value=data.bio||"";
   document.getElementById("interests").value=(data.interests||[]).join(", ");
+
+  if(data.avatar_url){
+   photo.src=data.avatar_url;
+   photo.style.display="block";
+  }else{
+   photo.removeAttribute("src");
+   photo.style.display="none";
+  }
+ }else{
+  photo.style.display="none";
  }
 }
+
 
 async function showMyProfile(){
  await showProfile();
