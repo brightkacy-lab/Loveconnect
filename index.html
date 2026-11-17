@@ -5,53 +5,153 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LoveConnect</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#fff5f7;color:#29212a;font-family:Arial,sans-serif}
-header{background:#e83e70;color:white;padding:22px;text-align:center}
+body{
+ margin:0;
+ background:#fff5f7;
+ color:#29212a;
+ font-family:Arial,sans-serif;
+}
+header{
+ background:linear-gradient(135deg,#e83e70,#b92565);
+ color:white;
+ padding:22px 15px;
+ text-align:center;
+}
 header h1{margin:0;font-size:28px}
-main{max-width:500px;margin:25px auto;padding:15px;padding-bottom:90px}
-.card{background:white;padding:22px;border-radius:18px;box-shadow:0 4px 20px #0001;margin-bottom:18px}
-h2{color:#e83e70}
-input,select,textarea{width:100%;padding:14px;margin:8px 0;border:1px solid #ddd;border-radius:9px;font-size:16px}
-textarea{min-height:90px}
-button{width:100%;padding:15px;background:#e83e70;color:white;border:0;border-radius:10px;font-size:16px;margin-top:12px}
+header p{margin:7px 0 0}
+main{
+ max-width:600px;
+ margin:15px auto;
+ padding:12px;
+ padding-bottom:100px;
+}
+.card{
+ background:white;
+ padding:18px;
+ border-radius:18px;
+ box-shadow:0 4px 20px #0001;
+ margin-bottom:16px;
+}
+h2{color:#e83e70;margin-top:5px}
+h3{margin-bottom:7px}
+input,select,textarea{
+ width:100%;
+ padding:13px;
+ margin:7px 0;
+ border:1px solid #ddd;
+ border-radius:10px;
+ font-size:15px;
+ background:white;
+}
+textarea{min-height:85px}
+button{
+ width:100%;
+ padding:13px;
+ background:#e83e70;
+ color:white;
+ border:0;
+ border-radius:10px;
+ font-size:15px;
+ margin-top:9px;
+ cursor:pointer;
+}
+button:disabled{opacity:.6}
 .secondary{background:#555}
-nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:15px 5px;box-shadow:0 -2px 12px #0001}
-nav span{color:#e83e70;font-size:13px}
+.light-button{background:#fce0e9;color:#bd285d}
+nav{
+ position:fixed;
+ bottom:0;
+ left:0;
+ right:0;
+ background:white;
+ display:flex;
+ justify-content:space-around;
+ gap:3px;
+ padding:9px 3px;
+ box-shadow:0 -2px 12px #0001;
+ z-index:10;
+}
+nav button{
+ background:transparent;
+ color:#e83e70;
+ font-size:11px;
+ padding:9px 2px;
+ margin:0;
+}
+nav button.active{
+ background:#fce0e9;
+ border-radius:10px;
+}
 small{color:#777}
-#profileCard{display:none}
-
-#chatMessages {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px 0;
-  max-height: 350px;
-  overflow-y: auto;
+#profileCard,#chatCard,#notificationCard{display:none}
+.profile-photo{
+ width:100%;
+ max-height:300px;
+ object-fit:cover;
+ border-radius:13px;
 }
-
-.message-bubble {
-  max-width: 80%;
-  padding: 12px 15px;
-  border-radius: 16px;
-  font-size: 15px;
-  overflow-wrap: anywhere;
+.online-dot{
+ display:inline-block;
+ width:9px;
+ height:9px;
+ border-radius:50%;
+ background:#20b86a;
+ margin-right:5px;
 }
-
-.my-message {
-  align-self: flex-end;
-  background: #fce0e9;
-  border-bottom-right-radius: 4px;
+.offline-dot{
+ display:inline-block;
+ width:9px;
+ height:9px;
+ border-radius:50%;
+ background:#999;
+ margin-right:5px;
 }
-
-.their-message {
-  align-self: flex-start;
-  background: #eeeeee;
-  border-bottom-left-radius: 4px;
+.status{font-size:12px;color:#777}
+.filter-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:7px;
+}
+#chatMessages{
+ display:flex;
+ flex-direction:column;
+ gap:10px;
+ padding:12px 0;
+ max-height:350px;
+ overflow-y:auto;
+}
+.message-bubble{
+ max-width:80%;
+ padding:12px 15px;
+ border-radius:16px;
+ font-size:15px;
+ overflow-wrap:anywhere;
+}
+.my-message{
+ align-self:flex-end;
+ background:#fce0e9;
+ border-bottom-right-radius:4px;
+}
+.their-message{
+ align-self:flex-start;
+ background:#eee;
+ border-bottom-left-radius:4px;
+}
+.unread{
+ border-left:4px solid #e83e70;
+ background:#fff4f7;
+}
+.empty{
+ text-align:center;
+ color:#777;
+ padding:20px;
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -59,26 +159,19 @@ small{color:#777}
 <p>Meet people. Make connections.</p>
 </header>
 
-<div class="card" id="discoverCard">
-<h2>❤️ Discover Singles</h2>
-<p>Meet other members of LoveConnect.</p>
-<button onclick="loadDiscover()">Find People</button>
-<button onclick="loadLikes()">💌 Who Liked Me</button>
-<button onclick="loadMatches()">❤️ My Matches</button>
-<div id="discoverList">
-<p>Tap Find People to discover members.</p>
-</div>
-</div>
-
 <main>
+
 <div class="card" id="authCard">
 <h2>Welcome to LoveConnect</h2>
 <p>Find genuine connections in Nigeria and around the world.</p>
+
 <h3>Create your account</h3>
 <input id="name" placeholder="Your full name">
 <input id="email" type="email" placeholder="Email address">
 <input id="password" type="password" placeholder="Password">
+
 <button onclick="register()">Create Account</button>
+
 <p style="text-align:center">Already a member?</p>
 <button onclick="login()">Log In</button>
 <p id="message"></p>
@@ -86,8 +179,8 @@ small{color:#777}
 </div>
 
 <div class="card" id="profileCard">
-<h2>👤 Create Your Profile</h2>
-<p>Tell other members about yourself.</p>
+<h2>👤 My Profile</h2>
+<p>Edit your details and keep your profile updated.</p>
 
 <input id="fullName" placeholder="Full name">
 <input id="avatar" type="file" accept="image/*">
@@ -102,29 +195,68 @@ small{color:#777}
 
 <input id="location" placeholder="Your city or country">
 <textarea id="bio" placeholder="Write something about yourself"></textarea>
-<input id="interests" placeholder="Your interests (separate with commas)">
+<input id="interests" placeholder="Your interests, separated by commas">
 
-<button onclick="saveProfile()">Save My Profile</button>
+<button onclick="saveProfile()">Save My Profile ❤️</button>
 <button class="secondary" onclick="logout()">Log Out</button>
 <p id="profileMessage"></p>
 </div>
-  <div class="card" id="chatCard" style="display:none">
-  <h2 id="chatTitle">💬 Private Chat</h2>
-  <div id="chatMessages"></div>
-  <textarea id="chatInput" placeholder="Write a message..."></textarea>
-  <button onclick="sendMessage()">Send Message ❤️</button>
-  <button class="secondary" onclick="loadMatches()">Back to Matches</button>
-  </div>
+
+<div class="card" id="discoverCard">
+<h2>❤️ Discover Singles</h2>
+<p>Find people and make genuine connections.</p>
+
+<h3>Search Filters</h3>
+
+<div class="filter-grid">
+<input id="minAge" type="number" placeholder="Minimum age">
+<input id="maxAge" type="number" placeholder="Maximum age">
+</div>
+
+<select id="filterGender">
+<option value="">Any gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
+</select>
+
+<input id="filterLocation" placeholder="Search city or country">
+
+<button onclick="loadDiscover()">Search Members 🔎</button>
+<button class="light-button" onclick="clearFilters()">Clear Filters</button>
+
+<div id="discoverList">
+<p class="empty">Log in and tap Search Members to discover people.</p>
+</div>
+</div>
+
+<div class="card" id="notificationCard">
+<h2>🔔 Notifications</h2>
+<p>See who likes you and when someone sends you a message.</p>
+<button class="light-button" onclick="loadNotifications()">Refresh Notifications</button>
+<div id="notificationList"></div>
+</div>
+
+<div class="card" id="chatCard">
+<h2 id="chatTitle">💬 Private Chat</h2>
+<div id="chatMessages"></div>
+<textarea id="chatInput" placeholder="Write a message..."></textarea>
+<button onclick="sendMessage()">Send Message ❤️</button>
+<button class="secondary" onclick="backToMatches()">Back to Matches</button>
+</div>
+
 </main>
 
-<nav>
-<span>❤️ Discover</span>
-<span>📍 Nearby</span>
-<span>💌 Likes</span>
-<span>👤 Profile</span>
+<nav id="appNav" style="display:none">
+<button id="navDiscover" onclick="showDiscover()">❤️<br>Discover</button>
+<button id="navLikes" onclick="loadLikes()">💌<br>Likes</button>
+<button id="navMatches" onclick="loadMatches()">💕<br>Matches</button>
+<button id="navNotifications" onclick="loadNotifications()">🔔<br>Alerts</button>
+<button id="navProfile" onclick="showMyProfile()">👤<br>Profile</button>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 const db = window.supabase.createClient(
 "https://bdwbkbbwrhdiaurqxlfk.supabase.co",
@@ -132,622 +264,717 @@ const db = window.supabase.createClient(
 );
 
 let currentUser = null;
-
-async function register() {
-const name = document.getElementById("name").value.trim();
-const email = document.getElementById("email").value.trim();
-const password = document.getElementById("password").value;
-const message = document.getElementById("message");
-
-if (!name || !email || !password) {
-message.textContent = "Please fill in all fields.";
-return;
-}
-
-message.textContent = "Creating your account...";
-
-const {data,error} = await db.auth.signUp({
-email,
-password,
-options:{data:{full_name:name}}
-});
-
-if(error){
-message.textContent = error.message;
-return;
-}
-
-message.textContent = data.session
-? "Account created successfully! You can create your profile."
-: "Account created! Check your email to confirm, then log in.";
-}
-
-async function login() {
-const email = document.getElementById("email").value.trim();
-const password = document.getElementById("password").value;
-const message = document.getElementById("message");
-
-const {data,error} = await db.auth.signInWithPassword({
-email,password
-});
-
-if(error){
-message.textContent = error.message;
-return;
-}
-
-currentUser = data.user;
-await showProfile();
-}
-
-async function showProfile() {
-document.getElementById("authCard").style.display = "none";
-document.getElementById("profileCard").style.display = "block";
-
-const {data,error} = await db.from("profiles")
-.select("*")
-.eq("id",currentUser.id)
-.maybeSingle();
-
-if(error){
-document.getElementById("profileMessage").textContent = error.message;
-return;
-}
-
-if(data){
-document.getElementById("fullName").value = data.full_name || "";
-document.getElementById("age").value = data.age || "";
-document.getElementById("gender").value = data.gender || "";
-document.getElementById("location").value = data.location || "";
-document.getElementById("bio").value = data.bio || "";
-document.getElementById("interests").value = (data.interests || []).join(", ");
-}
-}
-
-async function saveProfile() {
-const message = document.getElementById("profileMessage");
-
-if(!currentUser){
-message.textContent = "Please log in first.";
-return;
-}
-
-const fullName = document.getElementById("fullName").value.trim();
-const ageValue = document.getElementById("age").value;
-const age = ageValue ? Number(ageValue) : null;
-
-if(!fullName){
-message.textContent = "Please enter your full name.";
-return;
-}
-
-if(age !== null && (age < 18 || age > 100)){
-message.textContent = "Members must be 18 or older.";
-return;
-}
-
-message.textContent = "Saving your profile...";
-
-const interests = document.getElementById("interests").value
-.split(",")
-.map(item => item.trim())
-.filter(Boolean);
-// Keep the existing photo if no new photo is selected
-const { data: oldProfile } = await db
-  .from("profiles")
-  .select("avatar_url")
-  .eq("id", currentUser.id)
-  .maybeSingle();
-
-let avatarUrl = oldProfile?.avatar_url || null;
-
-const photoFile = document.getElementById("avatar").files[0];
-
-if (photoFile) {
-  if (!photoFile.type.startsWith("image/")) {
-    message.textContent = "Please select an image.";
-    return;
-  }
-
-  if (photoFile.size > 5 * 1024 * 1024) {
-    message.textContent = "Photo must be 5MB or smaller.";
-    return;
-  }
-
-  const extension = photoFile.name.split(".").pop().toLowerCase();
-  const filePath = currentUser.id + "/" + Date.now() + "." + extension;
-
-  const { error: uploadError } = await db.storage
-    .from("profile-photos")
-    .upload(filePath, photoFile);
-
-  if (uploadError) {
-    message.textContent = "Photo upload failed: " + uploadError.message;
-    return;
-  }
-
-  const { data: publicData } = db.storage
-    .from("profile-photos")
-    .getPublicUrl(filePath);
-
-  avatarUrl = publicData.publicUrl;
-  }
-const {error} = await db.from("profiles").upsert({
-id:currentUser.id,
-full_name:fullName,
-age:age,
-gender:document.getElementById("gender").value || null,
-location:document.getElementById("location").value.trim() || null,
-bio:document.getElementById("bio").value.trim() || null,
-interests:interests,
-avatar_url:avatarUrl
-},{onConflict:"id"});
-message.textContent = error
-? "Error: " + error.message
-: "Your profile has been saved successfully! ❤️";
-}
-
-async function logout() {
-await db.auth.signOut();
-currentUser = null;
-document.getElementById("profileCard").style.display = "none";
-document.getElementById("authCard").style.display = "block";
-document.getElementById("profileMessage").textContent = "";
-}
-
-async function loadDiscover() {
-  const list = document.getElementById("discoverList");
-
-  if (!currentUser) {
-    list.textContent = "Please log in first.";
-    return;
-  }
-
-  list.textContent = "Finding members...";
-
-  const { data, error } = await db
-    .from("profiles")
-    .select("id, full_name, age, gender, location, bio, interests, avatar_url")
-    .neq("id", currentUser.id)
-    .limit(20);
-
-  if (error) {
-    list.textContent = "Error: " + error.message;
-    return;
-  }
-
-  list.replaceChildren();
-
-  if (!data || data.length === 0) {
-    list.textContent = "No other members yet. Invite friends to join LoveConnect!";
-    return;
-  }
-data.forEach(person => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    if (person.avatar_url) {
-      const photo = document.createElement("img");
-      photo.src = person.avatar_url;
-      photo.alt = person.full_name || "Profile photo";
-      photo.style.width = "100%";
-      photo.style.maxHeight = "260px";
-      photo.style.objectFit = "cover";
-      photo.style.borderRadius = "12px";
-      card.appendChild(photo);
-    }
-
-    const name = document.createElement("h3");
-    name.textContent = person.full_name || "LoveConnect Member";
-
-    const details = document.createElement("p");
-    details.textContent =
-      (person.age ? person.age + " years old" : "Age not added") +
-      " • " + (person.gender || "Gender not added");
-
-    const location = document.createElement("p");
-    location.textContent = "📍 " + (person.location || "Location not added");
-
-    const bio = document.createElement("p");
-    bio.textContent = person.bio || "No bio added yet.";
-
-    const interests = document.createElement("p");
-    interests.textContent = "Interests: " + (person.interests || []).join(", ");
-
-    const likeButton = document.createElement("button");
-likeButton.textContent = "❤️ Like";
-likeButton.onclick = () => likePerson(person.id, likeButton);
-
-card.append(name, details, location, bio, interests, likeButton);
-    list.appendChild(card);
-  });
-}
-async function likePerson(personId, button) {
-  if (!currentUser) {
-    alert("Please log in first.");
-    return;
-  }
-
-  button.disabled = true;
-  button.textContent = "Sending...";
-
-  const { error } = await db.from("likes").insert({
-    liker_id: currentUser.id,
-    liked_id: personId
-  });
-
-  if (error) {
-    button.textContent = error.code === "23505"
-      ? "Already Liked ❤️"
-      : "Try Again";
-
-    if (error.code !== "23505") {
-      alert(error.message);
-      button.disabled = false;
-    }
-    return;
-  }
-
-    button.textContent = "Liked ❤️";
-}
-
-async function loadLikes() {
-  const list = document.getElementById("discoverList");
-
-  if (!currentUser) {
-    list.textContent = "Please log in first.";
-    return;
-  }
-
-  list.textContent = "Checking your likes...";
-
-  const { data, error } = await db
-    .from("likes")
-    .select("liker_id")
-    .eq("liked_id", currentUser.id);
-
-  if (error) {
-    list.textContent = "Error: " + error.message;
-    return;
-  }
-
-  list.replaceChildren();
-
-  if (!data || data.length === 0) {
-    list.textContent = "Nobody has liked you yet. ❤️";
-    return;
-  }
-
-  for (const like of data) {
-    const { data: person, error: profileError } = await db
-      .from("profiles")
-      .select("full_name, age, location, bio, avatar_url")
-      .eq("id", like.liker_id)
-      .maybeSingle();
-
-    if (profileError || !person) continue;
-
-    const card = document.createElement("div");
-    card.className = "card";
-
-    if (person.avatar_url) {
-      const photo = document.createElement("img");
-      photo.src = person.avatar_url;
-      photo.alt = person.full_name || "Profile photo";
-      photo.style.width = "100%";
-      photo.style.maxHeight = "260px";
-      photo.style.objectFit = "cover";
-      photo.style.borderRadius = "12px";
-      card.appendChild(photo);
-    }
-
-    const name = document.createElement("h3");
-    name.textContent = person.full_name || "LoveConnect Member";
-
-    const details = document.createElement("p");
-    details.textContent =
-      (person.age ? person.age + " years old" : "") +
-      " • " + (person.location || "Location not added");
-
-    const bio = document.createElement("p");
-    bio.textContent = person.bio || "No bio added yet.";
-
-    card.append(name, details, bio);
-    list.appendChild(card);
-  }
- } 
-  async function loadMatches() {
-  const list = document.getElementById("discoverList");
-
-  if (!currentUser) {
-    list.textContent = "Please log in first.";
-    return;
-  }
-
-  list.textContent = "Loading your matches...";
-
-  const { data, error } = await db
-    .from("matches")
-    .select("*")
-    .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`);
-
-  if (error) {
-    list.textContent = "Error: " + error.message;
-    return;
-  }
-
-  list.replaceChildren();
-
-  if (!data || data.length === 0) {
-    list.textContent = "No matches yet. Keep discovering! ❤️";
-    return;
-  }
-
-  for (const match of data) {
-    const otherId =
-      match.user1_id === currentUser.id
-        ? match.user2_id
-        : match.user1_id;
-
-    const { data: person } = await db
-      .from("profiles")
-      .select("full_name")
-      .eq("id", otherId)
-      .maybeSingle();
-
-    if (!person) continue;
-
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const name = document.createElement("h3");
-    name.textContent = "❤️ " + person.full_name;
-
-    const chatButton = document.createElement("button");
-    chatButton.textContent = "Open Chat";
-    chatButton.onclick = () => openChat(match.id, person.full_name);
-
-        card.append(name, chatButton);
-    list.appendChild(card);
-  }
-}
-
 let currentMatchId = null;
 let messageRefreshTimer = null;
+let presenceTimer = null;
 let loadingMessages = false;
 let lastMessagesSnapshot = "";
 
-async function openChat(matchId, personName) {
-  currentMatchId = matchId;
-  lastMessagesSnapshot = "";
+function showOnly(section){
+ const sections=["authCard","profileCard","discoverCard","notificationCard","chatCard"];
 
-  if (messageRefreshTimer) {
-    clearInterval(messageRefreshTimer);
-    messageRefreshTimer = null;
+ sections.forEach(id=>{
+  document.getElementById(id).style.display =
+   id===section ? "block":"none";
+ });
+
+ document.getElementById("appNav").style.display =
+  currentUser ? "flex":"none";
+}
+
+function setActiveNav(id){
+ document.querySelectorAll("nav button").forEach(button=>{
+  button.classList.remove("active");
+ });
+ const selected=document.getElementById(id);
+ if(selected) selected.classList.add("active");
+}
+
+async function register(){
+ const name=document.getElementById("name").value.trim();
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ const message=document.getElementById("message");
+
+ if(!name||!email||!password){
+  message.textContent="Please fill in all fields.";
+  return;
+ }
+
+ message.textContent="Creating your account...";
+
+ const {data,error}=await db.auth.signUp({
+  email,
+  password,
+  options:{data:{full_name:name}}
+ });
+
+ if(error){
+  message.textContent=error.message;
+  return;
+ }
+
+ if(data.session){
+  currentUser=data.user;
+  await showProfile();
+  await startPresence();
+ }else{
+  message.textContent="Account created! Check your email to confirm, then log in.";
+ }
+}
+
+async function login(){
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ const message=document.getElementById("message");
+
+ const {data,error}=await db.auth.signInWithPassword({
+  email,password
+ });
+
+ if(error){
+  message.textContent=error.message;
+  return;
+ }
+
+ currentUser=data.user;
+ await showProfile();
+ await startPresence();
+}
+
+async function showProfile(){
+ showOnly("profileCard");
+ setActiveNav("navProfile");
+
+ const {data,error}=await db.from("profiles")
+  .select("*")
+  .eq("id",currentUser.id)
+  .maybeSingle();
+
+ if(error){
+  document.getElementById("profileMessage").textContent=error.message;
+  return;
+ }
+
+ if(data){
+  document.getElementById("fullName").value=data.full_name||"";
+  document.getElementById("age").value=data.age||"";
+  document.getElementById("gender").value=data.gender||"";
+  document.getElementById("location").value=data.location||"";
+  document.getElementById("bio").value=data.bio||"";
+  document.getElementById("interests").value=(data.interests||[]).join(", ");
+ }
+}
+
+async function showMyProfile(){
+ await showProfile();
+}
+
+async function saveProfile(){
+ const message=document.getElementById("profileMessage");
+
+ if(!currentUser){
+  message.textContent="Please log in first.";
+  return;
+ }
+
+ const fullName=document.getElementById("fullName").value.trim();
+ const ageValue=document.getElementById("age").value;
+ const age=ageValue?Number(ageValue):null;
+
+ if(!fullName){
+  message.textContent="Please enter your full name.";
+  return;
+ }
+
+ if(age!==null&&(!Number.isInteger(age)||age<18||age>100)){
+  message.textContent="Members must be 18 or older.";
+  return;
+ }
+
+ message.textContent="Saving your profile...";
+
+ const interests=document.getElementById("interests").value
+  .split(",").map(item=>item.trim()).filter(Boolean);
+
+ const {data:oldProfile}=await db.from("profiles")
+  .select("avatar_url")
+  .eq("id",currentUser.id)
+  .maybeSingle();
+
+ let avatarUrl=oldProfile?.avatar_url||null;
+ const photoFile=document.getElementById("avatar").files[0];
+
+ if(photoFile){
+  if(!photoFile.type.startsWith("image/")){
+   message.textContent="Please select an image.";
+   return;
   }
 
-  document.getElementById("profileCard").style.display = "none";
-  document.getElementById("authCard").style.display = "none";
-  document.getElementById("discoverCard").style.display = "none";
-  document.getElementById("chatCard").style.display = "block";
+  if(photoFile.size>5*1024*1024){
+   message.textContent="Photo must be 5MB or smaller.";
+   return;
+  }
 
-  document.getElementById("chatTitle").textContent =
-    "💬 Chat with " + personName;
+  const extension=photoFile.name.split(".").pop().toLowerCase();
+  const filePath=currentUser.id+"/"+Date.now()+"."+extension;
 
-  const input = document.getElementById("chatInput");
+  const {error:uploadError}=await db.storage
+   .from("profile-photos")
+   .upload(filePath,photoFile);
 
-  input.onkeydown = function(event) {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      sendMessage();
+  if(uploadError){
+   message.textContent="Photo upload failed: "+uploadError.message;
+   return;
+  }
+
+  const {data:publicData}=db.storage
+   .from("profile-photos")
+   .getPublicUrl(filePath);
+
+  avatarUrl=publicData.publicUrl;
+ }
+
+ const {error}=await db.from("profiles").upsert({
+  id:currentUser.id,
+  full_name:fullName,
+  age:age,
+  gender:document.getElementById("gender").value||null,
+  location:document.getElementById("location").value.trim()||null,
+  bio:document.getElementById("bio").value.trim()||null,
+  interests:interests,
+  avatar_url:avatarUrl,
+  last_seen_at:new Date().toISOString()
+ },{onConflict:"id"});
+
+ message.textContent=error
+  ?"Error: "+error.message
+  :"Your profile has been saved successfully! ❤️";
+
+ document.getElementById("avatar").value="";
+}
+
+async function logout(){
+ if(presenceTimer){
+  clearInterval(presenceTimer);
+  presenceTimer=null;
+ }
+
+ if(messageRefreshTimer){
+  clearInterval(messageRefreshTimer);
+  messageRefreshTimer=null;
+ }
+
+ if(currentUser){
+  await db.from("profiles")
+   .update({last_seen_at:new Date().toISOString()})
+   .eq("id",currentUser.id);
+ }
+
+ await db.auth.signOut();
+ currentUser=null;
+ currentMatchId=null;
+
+ showOnly("authCard");
+ document.getElementById("message").textContent="";
+ document.getElementById("profileMessage").textContent="";
+}
+
+async function startPresence(){
+ if(!currentUser)return;
+
+ async function updatePresence(){
+  if(!currentUser)return;
+
+  const {error}=await db.from("profiles")
+   .update({last_seen_at:new Date().toISOString()})
+   .eq("id",currentUser.id);
+
+  if(error) console.log("Presence update:",error.message);
+ }
+
+ await updatePresence();
+
+ if(presenceTimer)clearInterval(presenceTimer);
+
+ presenceTimer=setInterval(updatePresence,60000);
+}
+
+function clearFilters(){
+ document.getElementById("minAge").value="";
+ document.getElementById("maxAge").value="";
+ document.getElementById("filterGender").value="";
+ document.getElementById("filterLocation").value="";
+ loadDiscover();
+}
+
+function showDiscover(){
+ showOnly("discoverCard");
+ setActiveNav("navDiscover");
+ loadDiscover();
+}
+
+async function loadDiscover(){
+ const list=document.getElementById("discoverList");
+
+ if(!currentUser){
+  list.textContent="Please log in first.";
+  return;
+ }
+
+ list.textContent="Finding members...";
+
+ let query=db.from("profiles")
+  .select("id,full_name,age,gender,location,bio,interests,avatar_url,last_seen_at")
+  .neq("id",currentUser.id)
+  .limit(50);
+
+ const minAge=document.getElementById("minAge").value;
+ const maxAge=document.getElementById("maxAge").value;
+ const gender=document.getElementById("filterGender").value;
+ const location=document.getElementById("filterLocation").value.trim();
+
+ if(minAge)query=query.gte("age",Number(minAge));
+ if(maxAge)query=query.lte("age",Number(maxAge));
+ if(gender)query=query.eq("gender",gender);
+ if(location)query=query.ilike("location","%"+location+"%");
+
+ const {data,error}=await query;
+
+ if(error){
+  list.textContent="Error: "+error.message;
+  return;
+ }
+
+ list.replaceChildren();
+
+ if(!data||data.length===0){
+  list.innerHTML='<p class="empty">No members found. Try changing your filters.</p>';
+  return;
+ }
+
+ data.forEach(person=>{
+  const card=document.createElement("div");
+  card.className="card";
+
+  if(person.avatar_url){
+   const photo=document.createElement("img");
+   photo.src=person.avatar_url;
+   photo.alt="Profile photo";
+   photo.className="profile-photo";
+   card.appendChild(photo);
+  }
+
+  const name=document.createElement("h3");
+  name.textContent=person.full_name||"LoveConnect Member";
+
+  const details=document.createElement("p");
+  details.textContent=(person.age?person.age+" years old":"Age not added")
+   +" • "+(person.gender||"Gender not added");
+
+  const locationText=document.createElement("p");
+  locationText.textContent="📍 "+(person.location||"Location not added");
+
+  const bio=document.createElement("p");
+  bio.textContent=person.bio||"No bio added yet.";
+
+  const interests=document.createElement("p");
+  interests.textContent="Interests: "+(person.interests||[]).join(", ");
+
+  const status=document.createElement("p");
+  status.className="status";
+
+  const lastSeen=person.last_seen_at
+   ?new Date(person.last_seen_at).getTime():0;
+
+  const online=lastSeen>0&&Date.now()-lastSeen<120000;
+
+  status.innerHTML=online
+   ?'<span class="online-dot"></span>Online'
+   :'<span class="offline-dot"></span>Offline';
+
+  const likeButton=document.createElement("button");
+  likeButton.textContent="❤️ Like";
+  likeButton.onclick=()=>likePerson(person.id,likeButton);
+
+  card.append(name,details,locationText,status,bio,interests,likeButton);
+  list.appendChild(card);
+ });
+}
+
+async function likePerson(personId,button){
+ if(!currentUser){
+  alert("Please log in first.");
+  return;
+ }
+
+ button.disabled=true;
+ button.textContent="Sending...";
+
+ const {error}=await db.from("likes").insert({
+  liker_id:currentUser.id,
+  liked_id:personId
+ });
+
+ if(error){
+  button.textContent=error.code==="23505"
+   ?"Already Liked ❤️":"Try Again";
+
+  if(error.code!=="23505"){
+   alert(error.message);
+   button.disabled=false;
+  }
+  return;
+ }
+
+ button.textContent="Liked ❤️";
+}
+
+async function loadLikes(){
+ showOnly("discoverCard");
+ setActiveNav("navLikes");
+
+ const list=document.getElementById("discoverList");
+
+ if(!currentUser){
+  list.textContent="Please log in first.";
+  return;
+ }
+
+ list.textContent="Checking your likes...";
+
+ const {data,error}=await db.from("likes")
+  .select("liker_id")
+  .eq("liked_id",currentUser.id);
+
+ if(error){
+  list.textContent="Error: "+error.message;
+  return;
+ }
+
+ list.replaceChildren();
+
+ if(!data||data.length===0){
+  list.innerHTML='<p class="empty">Nobody has liked you yet. ❤️</p>';
+  return;
+ }
+
+ for(const like of data){
+  const {data:person}=await db.from("profiles")
+   .select("full_name,age,location,bio,avatar_url")
+   .eq("id",like.liker_id)
+   .maybeSingle();
+
+  if(!person)continue;
+
+  const card=document.createElement("div");
+  card.className="card";
+
+  if(person.avatar_url){
+   const photo=document.createElement("img");
+   photo.src=person.avatar_url;
+   photo.className="profile-photo";
+   card.appendChild(photo);
+  }
+
+  const name=document.createElement("h3");
+  name.textContent=person.full_name||"LoveConnect Member";
+
+  const details=document.createElement("p");
+  details.textContent=(person.age?person.age+" years old":"")
+   +" • "+(person.location||"Location not added");
+
+  const bio=document.createElement("p");
+  bio.textContent=person.bio||"No bio added yet.";
+
+  card.append(name,details,bio);
+  list.appendChild(card);
+ }
+}
+
+async function loadMatches(){
+ showOnly("discoverCard");
+ setActiveNav("navMatches");
+
+ const list=document.getElementById("discoverList");
+
+ if(!currentUser){
+  list.textContent="Please log in first.";
+  return;
+ }
+
+ list.textContent="Loading your matches...";
+
+ const {data,error}=await db.from("matches")
+  .select("*")
+  .or("user1_id.eq."+currentUser.id+",user2_id.eq."+currentUser.id);
+
+ if(error){
+  list.textContent="Error: "+error.message;
+  return;
+ }
+
+ list.replaceChildren();
+
+ if(!data||data.length===0){
+  list.innerHTML='<p class="empty">No matches yet. Keep discovering! ❤️</p>';
+  return;
+ }
+
+ for(const match of data){
+  const otherId=match.user1_id===currentUser.id
+   ?match.user2_id:match.user1_id;
+
+  const {data:person}=await db.from("profiles")
+   .select("full_name,avatar_url")
+   .eq("id",otherId)
+   .maybeSingle();
+
+  if(!person)continue;
+
+  const card=document.createElement("div");
+  card.className="card";
+
+  if(person.avatar_url){
+   const photo=document.createElement("img");
+   photo.src=person.avatar_url;
+   photo.className="profile-photo";
+   card.appendChild(photo);
+  }
+
+  const name=document.createElement("h3");
+  name.textContent="❤️ "+person.full_name;
+
+  const chatButton=document.createElement("button");
+  chatButton.textContent="Open Chat 💬";
+  chatButton.onclick=()=>openChat(match.id,person.full_name);
+
+  card.append(name,chatButton);
+  list.appendChild(card);
+ }
+}
+
+async function loadNotifications(){
+ showOnly("notificationCard");
+ setActiveNav("navNotifications");
+
+ const list=document.getElementById("notificationList");
+
+ if(!currentUser){
+  list.textContent="Please log in first.";
+  return;
+ }
+
+ list.textContent="Loading notifications...";
+
+ const {data,error}=await db.from("notifications")
+  .select("*")
+  .eq("recipient_id",currentUser.id)
+  .order("created_at",{ascending:false})
+  .limit(50);
+
+ if(error){
+  list.textContent="Error: "+error.message;
+  return;
+ }
+
+ list.replaceChildren();
+
+ if(!data||data.length===0){
+  list.innerHTML='<p class="empty">You have no notifications yet. ❤️</p>';
+  return;
+ }
+
+ for(const notification of data){
+  const card=document.createElement("div");
+  card.className="card";
+
+  if(!notification.is_read)card.classList.add("unread");
+
+  const title=document.createElement("h3");
+  title.textContent=notification.type==="like"
+   ?"💌 New Like":"💬 New Message";
+
+  const message=document.createElement("p");
+  message.textContent=notification.message;
+
+  const date=document.createElement("small");
+  date.textContent=new Date(notification.created_at).toLocaleString("en-NG");
+
+  card.append(title,message,date);
+
+  if(!notification.is_read){
+   const readButton=document.createElement("button");
+   readButton.className="light-button";
+   readButton.textContent="Mark as Read";
+
+   readButton.onclick=async()=>{
+    const {error:updateError}=await db.from("notifications")
+     .update({is_read:true})
+     .eq("id",notification.id)
+     .eq("recipient_id",currentUser.id);
+
+    if(updateError){
+     alert(updateError.message);
+    }else{
+     card.classList.remove("unread");
+     readButton.remove();
     }
-  };
+   };
 
-  const backButton = document.querySelector(
-    "#chatCard .secondary"
-  );
+   card.appendChild(readButton);
+  }
 
-  backButton.onclick = async function() {
-    if (messageRefreshTimer) {
-      clearInterval(messageRefreshTimer);
-      messageRefreshTimer = null;
-    }
+  list.appendChild(card);
+ }
+}
 
-    document.getElementById("chatCard").style.display = "none";
-    document.getElementById("discoverCard").style.display = "block";
+async function openChat(matchId,personName){
+ currentMatchId=matchId;
+ lastMessagesSnapshot="";
 
-    await loadMatches();
-  };
+ if(messageRefreshTimer){
+  clearInterval(messageRefreshTimer);
+  messageRefreshTimer=null;
+ }
 
+ showOnly("chatCard");
+
+ document.getElementById("chatTitle").textContent="💬 Chat with "+personName;
+
+ const input=document.getElementById("chatInput");
+
+ input.onkeydown=function(event){
+  if(event.key==="Enter"&&!event.shiftKey){
+   event.preventDefault();
+   sendMessage();
+  }
+ };
+
+ await loadMessages();
+
+ messageRefreshTimer=setInterval(loadMessages,5000);
+}
+
+async function backToMatches(){
+ if(messageRefreshTimer){
+  clearInterval(messageRefreshTimer);
+  messageRefreshTimer=null;
+ }
+
+ currentMatchId=null;
+ await loadMatches();
+}
+
+async function loadMessages(){
+ if(!currentUser||!currentMatchId||loadingMessages)return;
+
+ loadingMessages=true;
+
+ const box=document.getElementById("chatMessages");
+ const thisMatchId=currentMatchId;
+
+ try{
+  const {data,error}=await db.from("messages")
+   .select("*")
+   .eq("match_id",thisMatchId)
+   .order("created_at",{ascending:true});
+
+  if(thisMatchId!==currentMatchId)return;
+
+  if(error){
+   box.textContent="Unable to load messages: "+error.message;
+   return;
+  }
+
+  const snapshot=JSON.stringify(data||[]);
+  if(snapshot===lastMessagesSnapshot)return;
+
+  lastMessagesSnapshot=snapshot;
+  box.replaceChildren();
+
+  if(!data||data.length===0){
+   box.textContent="Say hello! ❤️";
+   return;
+  }
+
+  data.forEach(message=>{
+   const item=document.createElement("div");
+
+   item.className=message.sender_id===currentUser.id
+    ?"message-bubble my-message"
+    :"message-bubble their-message";
+
+   const text=document.createElement("div");
+   text.textContent=message.content;
+
+   const time=document.createElement("small");
+   time.textContent=new Date(message.created_at).toLocaleTimeString(
+    "en-NG",{hour:"2-digit",minute:"2-digit"}
+   );
+
+   time.style.display="block";
+   time.style.marginTop="6px";
+
+   item.append(text,time);
+   box.appendChild(item);
+  });
+
+  box.scrollTop=box.scrollHeight;
+
+ }catch(error){
+  console.error(error);
+ }finally{
+  loadingMessages=false;
+ }
+}
+
+async function sendMessage(){
+ const input=document.getElementById("chatInput");
+ const content=input.value.trim();
+
+ if(!content||!currentMatchId||!currentUser)return;
+
+ const button=document.querySelector("#chatCard button:not(.secondary)");
+ button.disabled=true;
+ button.textContent="Sending...";
+
+ try{
+  const {error}=await db.from("messages").insert({
+   match_id:currentMatchId,
+   sender_id:currentUser.id,
+   content:content
+  });
+
+  if(error){
+   alert("Message not sent: "+error.message);
+   return;
+  }
+
+  input.value="";
+  lastMessagesSnapshot="";
   await loadMessages();
 
-  messageRefreshTimer = setInterval(function() {
-    loadMessages();
-  }, 5000);
+ }catch(error){
+  alert("Something went wrong. Please try again.");
+ }finally{
+  button.disabled=false;
+  button.textContent="Send Message ❤️";
+ }
 }
 
-async function loadMessages() {
-  if (!currentUser || !currentMatchId || loadingMessages) return;
+async function checkLogin(){
+ const {data}=await db.auth.getSession();
 
-  loadingMessages = true;
-
-  const box = document.getElementById("chatMessages");
-  const thisMatchId = currentMatchId;
-
-  try {
-    const { data, error } = await db
-      .from("messages")
-      .select("*")
-      .eq("match_id", thisMatchId)
-      .order("created_at", { ascending: true });
-
-    if (thisMatchId !== currentMatchId) return;
-
-    if (error) {
-      if (!box.children.length) {
-        box.textContent = "Unable to load messages: " + error.message;
-      }
-      return;
-    }
-
-    const snapshot = JSON.stringify(data || []);
-
-    if (snapshot === lastMessagesSnapshot) return;
-
-    lastMessagesSnapshot = snapshot;
-    box.replaceChildren();
-
-    if (!data || data.length === 0) {
-      box.textContent = "Say hello! ❤️";
-      return;
-    }
-
-    let previousDate = "";
-
-    data.forEach(function(message) {
-      const messageDate = new Date(message.created_at);
-
-      const dateKey = [
-        messageDate.getFullYear(),
-        messageDate.getMonth(),
-        messageDate.getDate()
-      ].join("-");
-
-      if (dateKey !== previousDate) {
-        const divider = document.createElement("div");
-        divider.className = "chat-date-divider";
-
-        const today = new Date();
-        const yesterday = new Date();
-        yesterday.setDate(today.getDate() - 1);
-
-        function sameDay(a, b) {
-          return a.getFullYear() === b.getFullYear() &&
-            a.getMonth() === b.getMonth() &&
-            a.getDate() === b.getDate();
-        }
-
-        let dateLabel;
-
-        if (sameDay(messageDate, today)) {
-          dateLabel = "Today";
-        } else if (sameDay(messageDate, yesterday)) {
-          dateLabel = "Yesterday";
-        } else {
-          dateLabel = messageDate.toLocaleDateString(
-            "en-NG",
-            {
-              day: "numeric",
-              month: "long",
-              year: "numeric"
-            }
-          );
-        }
-
-        divider.textContent = dateLabel;
-        divider.style.textAlign = "center";
-        divider.style.margin = "15px auto";
-        divider.style.padding = "6px 14px";
-        divider.style.background = "#fce0e9";
-        divider.style.borderRadius = "15px";
-        divider.style.fontSize = "12px";
-        divider.style.color = "#704653";
-        divider.style.width = "fit-content";
-
-        box.appendChild(divider);
-        previousDate = dateKey;
-      }
-
-      const item = document.createElement("div");
-
-      item.className =
-        message.sender_id === currentUser.id
-          ? "message-bubble my-message"
-          : "message-bubble their-message";
-
-      const messageText = document.createElement("div");
-      messageText.textContent = message.content;
-
-      const messageTime = document.createElement("small");
-
-      messageTime.textContent = messageDate.toLocaleTimeString(
-        "en-NG",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true
-        }
-      );
-
-      messageTime.style.display = "block";
-      messageTime.style.fontSize = "10px";
-      messageTime.style.marginTop = "6px";
-      messageTime.style.color = "#777";
-      messageTime.style.textAlign = "right";
-
-      item.append(messageText, messageTime);
-      box.appendChild(item);
-    });
-
-    box.scrollTop = box.scrollHeight;
-
-  } catch (error) {
-    console.error("Message loading error:", error);
-  } finally {
-    loadingMessages = false;
-  }
-}
-
-async function sendMessage() {
-  const input = document.getElementById("chatInput");
-  const content = input.value.trim();
-
-  if (!content || !currentMatchId || !currentUser) return;
-
-  const sendButton = document.querySelector(
-    "#chatCard button:not(.secondary)"
-  );
-
-  if (sendButton) {
-    sendButton.disabled = true;
-    sendButton.textContent = "Sending...";
-  }
-
-  try {
-    const { error } = await db.from("messages").insert({
-      match_id: currentMatchId,
-      sender_id: currentUser.id,
-      content: content
-    });
-
-    if (error) {
-      alert("Message not sent: " + error.message);
-      return;
-    }
-
-    input.value = "";
-    lastMessagesSnapshot = "";
-    await loadMessages();
-
-  } catch (error) {
-    alert("Something went wrong. Please try again.");
-  } finally {
-    if (sendButton) {
-      sendButton.disabled = false;
-      sendButton.textContent = "Send Message ❤️";
-    }
-  }
-}
-
-async function checkLogin() {
-const {data} = await db.auth.getSession();
-if(data.session){
-currentUser = data.session.user;
-await showProfile();
-}
+ if(data.session){
+  currentUser=data.session.user;
+  await showProfile();
+  await startPresence();
+ }
 }
 
 checkLogin();
 </script>
+
 </body>
 </html>
