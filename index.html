@@ -466,17 +466,15 @@ async function saveProfile(){
   last_seen_at:new Date().toISOString()
  },{onConflict:"id"});
 
- message.textContent=error
+  message.textContent=error
   ?"Error: "+error.message
   :"Your profile has been saved successfully! ❤️";
 
-document.getElementById("avatar").value="";
+ document.getElementById("avatar").value="";
 
-if(!error && avatarUrl){
- const photo=document.getElementById("myProfilePhoto");
- photo.src=avatarUrl;
- photo.style.display="block";
-}
+ if(!error){
+  await showProfile();
+ }
  }
 async function logout(){
  if(presenceTimer){
