@@ -1,0 +1,20 @@
+{
+  "id": "/Loveconnect/",
+  "name": "LoveConnect",
+  "short_name": "LoveConnect",
+  "description": "Meet people. Make genuine connections.",
+  "start_url": "/Loveconnect/",
+  "scope": "/Loveconnect/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff5f7",
+  "theme_color": "#e83e70",
+  "icons": [
+    {
+      "src": "/Loveconnect/icons/loveconnect.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
