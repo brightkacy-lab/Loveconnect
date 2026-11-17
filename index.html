@@ -9,146 +9,126 @@
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;
- background:#fff5f7;
- color:#29212a;
+ margin:0;background:#fff5f7;color:#29212a;
  font-family:Arial,sans-serif;
 }
 header{
  background:linear-gradient(135deg,#e83e70,#b92565);
- color:white;
- padding:22px 15px;
- text-align:center;
+ color:white;padding:22px 15px;text-align:center;
 }
 header h1{margin:0;font-size:28px}
 header p{margin:7px 0 0}
 main{
- max-width:600px;
- margin:15px auto;
- padding:12px;
+ max-width:600px;margin:15px auto;padding:12px;
  padding-bottom:100px;
 }
 .card{
- background:white;
- padding:18px;
- border-radius:18px;
- box-shadow:0 4px 20px #0001;
- margin-bottom:16px;
+ background:white;padding:18px;border-radius:18px;
+ box-shadow:0 4px 20px #0001;margin-bottom:16px;
 }
 h2{color:#e83e70;margin-top:5px}
 h3{margin-bottom:7px}
 input,select,textarea{
- width:100%;
- padding:13px;
- margin:7px 0;
- border:1px solid #ddd;
- border-radius:10px;
- font-size:15px;
- background:white;
+ width:100%;padding:13px;margin:7px 0;
+ border:1px solid #ddd;border-radius:10px;
+ font-size:15px;background:white;
 }
 textarea{min-height:85px}
 button{
- width:100%;
- padding:13px;
- background:#e83e70;
- color:white;
- border:0;
- border-radius:10px;
- font-size:15px;
- margin-top:9px;
- cursor:pointer;
+ width:100%;padding:13px;background:#e83e70;
+ color:white;border:0;border-radius:10px;
+ font-size:15px;margin-top:9px;cursor:pointer;
 }
 button:disabled{opacity:.6}
 .secondary{background:#555}
 .light-button{background:#fce0e9;color:#bd285d}
+.dislike-button{background:#555}
+.undo-button{background:#fff0f4;color:#bd285d}
 nav{
- position:fixed;
- bottom:0;
- left:0;
- right:0;
- background:white;
- display:flex;
- justify-content:space-around;
- gap:3px;
- padding:9px 3px;
- box-shadow:0 -2px 12px #0001;
+ position:fixed;bottom:0;left:0;right:0;
+ background:white;display:flex;justify-content:space-around;
+ gap:3px;padding:9px 3px;box-shadow:0 -2px 12px #0001;
  z-index:10;
 }
 nav button{
- background:transparent;
- color:#e83e70;
- font-size:11px;
- padding:9px 2px;
- margin:0;
+ background:transparent;color:#e83e70;font-size:11px;
+ padding:9px 2px;margin:0;
 }
-nav button.active{
- background:#fce0e9;
- border-radius:10px;
-}
+nav button.active{background:#fce0e9;border-radius:10px}
 small{color:#777}
 #profileCard,#chatCard,#notificationCard{display:none}
 .profile-photo{
- width:100%;
- max-height:300px;
- object-fit:cover;
+ width:100%;max-height:300px;object-fit:cover;
  border-radius:13px;
 }
-.online-dot{
- display:inline-block;
- width:9px;
- height:9px;
- border-radius:50%;
- background:#20b86a;
- margin-right:5px;
+.online-dot,.offline-dot{
+ display:inline-block;width:9px;height:9px;
+ border-radius:50%;margin-right:5px;
 }
-.offline-dot{
- display:inline-block;
- width:9px;
- height:9px;
- border-radius:50%;
- background:#999;
- margin-right:5px;
-}
+.online-dot{background:#20b86a}
+.offline-dot{background:#999}
 .status{font-size:12px;color:#777}
-.filter-grid{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:7px;
-}
+.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 #chatMessages{
- display:flex;
- flex-direction:column;
- gap:10px;
- padding:12px 0;
- max-height:350px;
- overflow-y:auto;
+ display:flex;flex-direction:column;gap:10px;
+ padding:12px 0;max-height:350px;overflow-y:auto;
 }
 .message-bubble{
- max-width:80%;
- padding:12px 15px;
- border-radius:16px;
- font-size:15px;
- overflow-wrap:anywhere;
+ max-width:80%;padding:12px 15px;border-radius:16px;
+ font-size:15px;overflow-wrap:anywhere;
 }
-.my-message{
- align-self:flex-end;
- background:#fce0e9;
- border-bottom-right-radius:4px;
+.my-message{align-self:flex-end;background:#fce0e9;border-bottom-right-radius:4px}
+.their-message{align-self:flex-start;background:#eee;border-bottom-left-radius:4px}
+.unread{border-left:4px solid #e83e70;background:#fff4f7}
+.empty{text-align:center;color:#777;padding:20px}
+.profile-details{line-height:1.7;overflow-wrap:anywhere}
+.profile-details p{margin:8px 0}
+.my-small-photo{
+ width:90px;height:90px;object-fit:cover;
+ border-radius:50%;display:block;margin:10px auto;
 }
-.their-message{
- align-self:flex-start;
- background:#eee;
- border-bottom-left-radius:4px;
+.discover-card{
+ padding:12px;overflow:hidden;
+ touch-action:pan-y;user-select:none;
 }
-.unread{
- border-left:4px solid #e83e70;
- background:#fff4f7;
+.discover-card img{
+ width:100%;height:360px;max-height:55vh;
+ object-fit:cover;border-radius:14px;
 }
-.empty{
- text-align:center;
- color:#777;
- padding:20px;
+.discover-card.no-photo{
+ min-height:220px;display:flex;
+ align-items:center;justify-content:center;
+ background:#fce0e9;color:#bd285d;
+ border-radius:14px;font-size:60px;
 }
+.discover-actions{
+ display:flex;gap:15px;justify-content:center;
+ margin-top:12px;
+}
+.discover-actions button{
+ width:75px;height:65px;border-radius:50%;
+ font-size:25px;padding:0;margin:0;
+}
+.discover-actions .dislike-button{background:#555}
+.discover-actions .like-action{background:#e83e70}
+.discover-name{font-size:24px;margin:12px 0 5px}
+.discover-info{color:#777;margin:5px 0}
+.compact-like{
+ display:flex;align-items:center;gap:13px;
+ padding:12px 0;border-bottom:1px solid #eee;
+}
+.compact-like img{
+ width:65px;height:65px;object-fit:cover;
+ border-radius:50%;flex-shrink:0;
+}
+.compact-like .no-photo{
+ width:65px;height:65px;border-radius:50%;
+ background:#fce0e9;display:flex;align-items:center;
+ justify-content:center;font-size:25px;flex-shrink:0;
+}
+.compact-like-info{flex:1;min-width:0}
+.compact-like-info h3{margin:0 0 5px}
+.compact-like-info p{margin:0;color:#777;font-size:13px}
 </style>
 </head>
 
@@ -164,28 +144,39 @@ small{color:#777}
 <div class="card" id="authCard">
 <h2>Welcome to LoveConnect</h2>
 <p>Find genuine connections in Nigeria and around the world.</p>
-
 <h3>Create your account</h3>
 <input id="name" placeholder="Your full name">
 <input id="email" type="email" placeholder="Email address">
 <input id="password" type="password" placeholder="Password">
-
 <button onclick="register()">Create Account</button>
-
 <p style="text-align:center">Already a member?</p>
 <button onclick="login()">Log In</button>
 <p id="message"></p>
 <small>Free to use. No VIP membership or subscriptions.</small>
 </div>
 
+<!-- PROFILE -->
 <div class="card" id="profileCard">
 <h2>👤 My Profile</h2>
-<p>Edit your details and keep your profile updated.</p>
 
-<img id="myProfilePhoto"
-class="profile-photo"
-style="display:none"
-alt="My profile picture">
+<div id="profileView" style="display:none">
+<img id="myProfilePhoto" class="profile-photo"
+style="display:none" alt="My profile picture">
+
+<div class="profile-details">
+<h3 id="viewName" style="text-align:center"></h3>
+<p id="viewAge"></p>
+<p id="viewGender"></p>
+<p id="viewLocation"></p>
+<p id="viewBio"></p>
+<p id="viewInterests"></p>
+</div>
+
+<button onclick="editProfile()">✏️ Edit Profile</button>
+</div>
+
+<div id="profileEditor" style="display:none">
+<p>Edit your details and keep your profile updated.</p>
 
 <input id="fullName" placeholder="Full name">
 <input id="avatar" type="file" accept="image/*">
@@ -202,17 +193,21 @@ alt="My profile picture">
 <textarea id="bio" placeholder="Write something about yourself"></textarea>
 <input id="interests" placeholder="Your interests, separated by commas">
 
-<button onclick="saveProfile()">Save My Profile ❤️</button>
+<button onclick="saveProfile()">Save Changes ❤️</button>
+<button class="secondary" onclick="cancelEdit()">Cancel</button>
+</div>
+
 <button class="secondary" onclick="logout()">Log Out</button>
 <p id="profileMessage"></p>
 </div>
 
+<!-- DISCOVER -->
 <div class="card" id="discoverCard">
 <h2>❤️ Discover Singles</h2>
-<p>Find people and make genuine connections.</p>
+<p>Swipe right to like or left to dislike.</p>
 
+<div id="filterPanel">
 <h3>Search Filters</h3>
-
 <div class="filter-grid">
 <input id="minAge" type="number" placeholder="Minimum age">
 <input id="maxAge" type="number" placeholder="Maximum age">
@@ -226,15 +221,20 @@ alt="My profile picture">
 </select>
 
 <input id="filterLocation" placeholder="Search city or country">
-
 <button onclick="loadDiscover()">Search Members 🔎</button>
 <button class="light-button" onclick="clearFilters()">Clear Filters</button>
+</div>
 
 <div id="discoverList">
-<p class="empty">Log in and tap Search Members to discover people.</p>
+<p class="empty">Log in and discover people.</p>
+</div>
+
+<div id="undoArea" style="display:none">
+<button class="undo-button" onclick="undoDislike()">↩️ Undo Last Dislike</button>
 </div>
 </div>
 
+<!-- NOTIFICATIONS -->
 <div class="card" id="notificationCard">
 <h2>🔔 Notifications</h2>
 <p>See who likes you and when someone sends you a message.</p>
@@ -242,6 +242,7 @@ alt="My profile picture">
 <div id="notificationList"></div>
 </div>
 
+<!-- CHAT -->
 <div class="card" id="chatCard">
 <h2 id="chatTitle">💬 Private Chat</h2>
 <div id="chatMessages"></div>
@@ -263,28 +264,43 @@ alt="My profile picture">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const db = window.supabase.createClient(
-"https://bdwbkbbwrhdiaurqxlfk.supabase.co",
-"sb_publishable_LX0TxYKI521RS_qG0YFNOg_P568uSUp"
+const db=window.supabase.createClient(
+ "https://bdwbkbbwrhdiaurqxlfk.supabase.co",
+ "sb_publishable_LX0TxYKI521RS_qG0YFNOg_P568uSUp"
 );
 
-let currentUser = null;
-let currentMatchId = null;
-let messageRefreshTimer = null;
-let presenceTimer = null;
-let loadingMessages = false;
-let lastMessagesSnapshot = "";
+let currentUser=null;
+let currentMatchId=null;
+let messageRefreshTimer=null;
+let presenceTimer=null;
+let loadingMessages=false;
+let lastMessagesSnapshot="";
+
+let discoverPeople=[];
+let lastDislikedPerson=null;
+let swipeStartX=0;
+let swipeStartY=0;
+
+function dislikedKey(){
+ return currentUser ? "loveconnect_disliked_"+currentUser.id : "";
+}
+
+function getDisliked(){
+ if(!currentUser)return [];
+ try{return JSON.parse(localStorage.getItem(dislikedKey())||"[]");}
+ catch(e){return [];}
+}
+
+function saveDisliked(ids){
+ localStorage.setItem(dislikedKey(),JSON.stringify(ids));
+}
 
 function showOnly(section){
  const sections=["authCard","profileCard","discoverCard","notificationCard","chatCard"];
-
  sections.forEach(id=>{
-  document.getElementById(id).style.display =
-   id===section ? "block":"none";
+  document.getElementById(id).style.display=id===section?"block":"none";
  });
-
- document.getElementById("appNav").style.display =
-  currentUser ? "flex":"none";
+ document.getElementById("appNav").style.display=currentUser?"flex":"none";
 }
 
 function setActiveNav(id){
@@ -292,7 +308,7 @@ function setActiveNav(id){
   button.classList.remove("active");
  });
  const selected=document.getElementById(id);
- if(selected) selected.classList.add("active");
+ if(selected)selected.classList.add("active");
 }
 
 async function register(){
@@ -309,15 +325,11 @@ async function register(){
  message.textContent="Creating your account...";
 
  const {data,error}=await db.auth.signUp({
-  email,
-  password,
+  email,password,
   options:{data:{full_name:name}}
  });
 
- if(error){
-  message.textContent=error.message;
-  return;
- }
+ if(error){message.textContent=error.message;return;}
 
  if(data.session){
   currentUser=data.user;
@@ -333,44 +345,38 @@ async function login(){
  const password=document.getElementById("password").value;
  const message=document.getElementById("message");
 
- const {data,error}=await db.auth.signInWithPassword({
-  email,password
- });
+ const {data,error}=await db.auth.signInWithPassword({email,password});
 
- if(error){
-  message.textContent=error.message;
-  return;
- }
+ if(error){message.textContent=error.message;return;}
 
  currentUser=data.user;
  await showProfile();
  await startPresence();
 }
 
-
 async function showProfile(){
  showOnly("profileCard");
  setActiveNav("navProfile");
 
+ document.getElementById("profileMessage").textContent="";
+
  const {data,error}=await db.from("profiles")
-  .select("*")
-  .eq("id",currentUser.id)
-  .maybeSingle();
+  .select("*").eq("id",currentUser.id).maybeSingle();
 
  if(error){
   document.getElementById("profileMessage").textContent=error.message;
   return;
  }
 
- const photo=document.getElementById("myProfilePhoto");
-
  if(data){
-  document.getElementById("fullName").value=data.full_name||"";
-  document.getElementById("age").value=data.age||"";
-  document.getElementById("gender").value=data.gender||"";
-  document.getElementById("location").value=data.location||"";
-  document.getElementById("bio").value=data.bio||"";
-  document.getElementById("interests").value=(data.interests||[]).join(", ");
+  document.getElementById("viewName").textContent=data.full_name||"LoveConnect Member";
+  document.getElementById("viewAge").textContent=data.age?data.age+" years old":"Age not added";
+  document.getElementById("viewGender").textContent="Gender: "+(data.gender||"Not added");
+  document.getElementById("viewLocation").textContent="📍 "+(data.location||"Location not added");
+  document.getElementById("viewBio").textContent=data.bio||"No bio added yet.";
+  document.getElementById("viewInterests").textContent="Interests: "+(data.interests||[]).join(", ");
+
+  const photo=document.getElementById("myProfilePhoto");
 
   if(data.avatar_url){
    photo.src=data.avatar_url;
@@ -379,13 +385,33 @@ async function showProfile(){
    photo.removeAttribute("src");
    photo.style.display="none";
   }
+
+  document.getElementById("fullName").value=data.full_name||"";
+  document.getElementById("age").value=data.age||"";
+  document.getElementById("gender").value=data.gender||"";
+  document.getElementById("location").value=data.location||"";
+  document.getElementById("bio").value=data.bio||"";
+  document.getElementById("interests").value=(data.interests||[]).join(", ");
+
+  document.getElementById("profileView").style.display="block";
+  document.getElementById("profileEditor").style.display="none";
  }else{
-  photo.style.display="none";
+  document.getElementById("profileView").style.display="none";
+  document.getElementById("profileEditor").style.display="block";
  }
 }
 
-
 async function showMyProfile(){
+ await showProfile();
+}
+
+function editProfile(){
+ document.getElementById("profileView").style.display="none";
+ document.getElementById("profileEditor").style.display="block";
+ document.getElementById("profileMessage").textContent="";
+}
+
+async function cancelEdit(){
  await showProfile();
 }
 
@@ -417,9 +443,7 @@ async function saveProfile(){
   .split(",").map(item=>item.trim()).filter(Boolean);
 
  const {data:oldProfile}=await db.from("profiles")
-  .select("avatar_url")
-  .eq("id",currentUser.id)
-  .maybeSingle();
+  .select("avatar_url").eq("id",currentUser.id).maybeSingle();
 
  let avatarUrl=oldProfile?.avatar_url||null;
  const photoFile=document.getElementById("avatar").files[0];
@@ -439,8 +463,7 @@ async function saveProfile(){
   const filePath=currentUser.id+"/"+Date.now()+"."+extension;
 
   const {error:uploadError}=await db.storage
-   .from("profile-photos")
-   .upload(filePath,photoFile);
+   .from("profile-photos").upload(filePath,photoFile);
 
   if(uploadError){
    message.textContent="Photo upload failed: "+uploadError.message;
@@ -448,8 +471,7 @@ async function saveProfile(){
   }
 
   const {data:publicData}=db.storage
-   .from("profile-photos")
-   .getPublicUrl(filePath);
+   .from("profile-photos").getPublicUrl(filePath);
 
   avatarUrl=publicData.publicUrl;
  }
@@ -466,26 +488,20 @@ async function saveProfile(){
   last_seen_at:new Date().toISOString()
  },{onConflict:"id"});
 
-  message.textContent=error
-  ?"Error: "+error.message
-  :"Your profile has been saved successfully! ❤️";
+ if(error){
+  message.textContent="Error: "+error.message;
+  return;
+ }
 
  document.getElementById("avatar").value="";
+ message.textContent="Your profile has been saved successfully! ❤️";
+ await showProfile();
+ document.getElementById("profileMessage").textContent="Your profile has been saved successfully! ❤️";
+}
 
- if(!error){
-  await showProfile();
- }
- }
 async function logout(){
- if(presenceTimer){
-  clearInterval(presenceTimer);
-  presenceTimer=null;
- }
-
- if(messageRefreshTimer){
-  clearInterval(messageRefreshTimer);
-  messageRefreshTimer=null;
- }
+ if(presenceTimer){clearInterval(presenceTimer);presenceTimer=null;}
+ if(messageRefreshTimer){clearInterval(messageRefreshTimer);messageRefreshTimer=null;}
 
  if(currentUser){
   await db.from("profiles")
@@ -496,6 +512,8 @@ async function logout(){
  await db.auth.signOut();
  currentUser=null;
  currentMatchId=null;
+ discoverPeople=[];
+ lastDislikedPerson=null;
 
  showOnly("authCard");
  document.getElementById("message").textContent="";
@@ -507,18 +525,14 @@ async function startPresence(){
 
  async function updatePresence(){
   if(!currentUser)return;
-
   const {error}=await db.from("profiles")
    .update({last_seen_at:new Date().toISOString()})
    .eq("id",currentUser.id);
-
-  if(error) console.log("Presence update:",error.message);
+  if(error)console.log("Presence update:",error.message);
  }
 
  await updatePresence();
-
  if(presenceTimer)clearInterval(presenceTimer);
-
  presenceTimer=setInterval(updatePresence,60000);
 }
 
@@ -533,23 +547,22 @@ function clearFilters(){
 function showDiscover(){
  showOnly("discoverCard");
  setActiveNav("navDiscover");
+ document.getElementById("filterPanel").style.display="block";
  loadDiscover();
 }
 
 async function loadDiscover(){
  const list=document.getElementById("discoverList");
 
- if(!currentUser){
-  list.textContent="Please log in first.";
-  return;
- }
+ if(!currentUser){list.textContent="Please log in first.";return;}
 
- list.textContent="Finding members...";
+ list.innerHTML='<p class="empty">Finding members...</p>';
+ document.getElementById("filterPanel").style.display="block";
 
  let query=db.from("profiles")
   .select("id,full_name,age,gender,location,bio,interests,avatar_url,last_seen_at")
   .neq("id",currentUser.id)
-  .limit(50);
+  .limit(100);
 
  const minAge=document.getElementById("minAge").value;
  const maxAge=document.getElementById("maxAge").value;
@@ -561,77 +574,161 @@ async function loadDiscover(){
  if(gender)query=query.eq("gender",gender);
  if(location)query=query.ilike("location","%"+location+"%");
 
- const {data,error}=await query;
+ const [{data,error},{data:myLikes, error:likeError}]=await Promise.all([
+  query,
+  db.from("likes").select("liked_id").eq("liker_id",currentUser.id)
+ ]);
 
- if(error){
-  list.textContent="Error: "+error.message;
-  return;
- }
+ if(error){list.textContent="Error: "+error.message;return;}
+ if(likeError){list.textContent="Unable to check your previous likes: "+likeError.message;return;}
 
+ const alreadyLiked=(myLikes||[]).map(item=>item.liked_id);
+ const disliked=getDisliked();
+
+ discoverPeople=(data||[]).filter(person=>
+  !alreadyLiked.includes(person.id)&&!disliked.includes(person.id)
+ );
+
+ lastDislikedPerson=null;
+ updateUndoButton();
+ renderDiscover();
+}
+
+function renderDiscover(){
+ const list=document.getElementById("discoverList");
  list.replaceChildren();
 
- if(!data||data.length===0){
-  list.innerHTML='<p class="empty">No members found. Try changing your filters.</p>';
+ if(discoverPeople.length===0){
+  list.innerHTML='<p class="empty">No more members found. Try changing your filters or come back later. ❤️</p>';
   return;
  }
 
- data.forEach(person=>{
-  const card=document.createElement("div");
-  card.className="card";
+ const person=discoverPeople[0];
+ const card=document.createElement("div");
+ card.className="discover-card";
+ card.id="swipeCard";
 
-  if(person.avatar_url){
-   const photo=document.createElement("img");
-   photo.src=person.avatar_url;
-   photo.alt="Profile photo";
-   photo.className="profile-photo";
-   card.appendChild(photo);
+ if(person.avatar_url){
+  const photo=document.createElement("img");
+  photo.src=person.avatar_url;
+  photo.alt="Profile photo";
+  card.appendChild(photo);
+ }else{
+  const placeholder=document.createElement("div");
+  placeholder.className="no-photo";
+  placeholder.textContent="❤️";
+  card.appendChild(placeholder);
+ }
+
+ const name=document.createElement("h2");
+ name.className="discover-name";
+ name.textContent=person.full_name||"LoveConnect Member";
+
+ const details=document.createElement("p");
+ details.className="discover-info";
+ details.textContent=(person.age?person.age+" years old":"Age not added")
+  +" • "+(person.gender||"Gender not added");
+
+ const place=document.createElement("p");
+ place.className="discover-info";
+ place.textContent="📍 "+(person.location||"Location not added");
+
+ const bio=document.createElement("p");
+ bio.textContent=person.bio||"No bio added yet.";
+
+ const interests=document.createElement("p");
+ interests.textContent="Interests: "+(person.interests||[]).join(", ");
+
+ const status=document.createElement("p");
+ status.className="status";
+
+ const lastSeen=person.last_seen_at?new Date(person.last_seen_at).getTime():0;
+ const online=lastSeen>0&&Date.now()-lastSeen<120000;
+ status.innerHTML=online
+  ?'<span class="online-dot"></span>Online'
+  :'<span class="offline-dot"></span>Offline';
+
+ const actions=document.createElement("div");
+ actions.className="discover-actions";
+
+ const dislike=document.createElement("button");
+ dislike.className="dislike-button";
+ dislike.textContent="💔";
+ dislike.title="Dislike";
+ dislike.onclick=()=>dislikePerson();
+
+ const like=document.createElement("button");
+ like.className="like-action";
+ like.textContent="❤️";
+ like.title="Like";
+ like.onclick=()=>likePerson(person.id,like);
+
+ actions.append(dislike,like);
+ card.append(name,details,place,status,bio,interests,actions);
+ list.appendChild(card);
+
+ card.addEventListener("pointerdown",event=>{
+  swipeStartX=event.clientX;
+  swipeStartY=event.clientY;
+ });
+
+ card.addEventListener("pointerup",event=>{
+  const diffX=event.clientX-swipeStartX;
+  const diffY=event.clientY-swipeStartY;
+
+  if(Math.abs(diffX)>80&&Math.abs(diffX)>Math.abs(diffY)){
+   if(diffX>0){
+    likePerson(person.id,like);
+   }else{
+    dislikePerson();
+   }
   }
-
-  const name=document.createElement("h3");
-  name.textContent=person.full_name||"LoveConnect Member";
-
-  const details=document.createElement("p");
-  details.textContent=(person.age?person.age+" years old":"Age not added")
-   +" • "+(person.gender||"Gender not added");
-
-  const locationText=document.createElement("p");
-  locationText.textContent="📍 "+(person.location||"Location not added");
-
-  const bio=document.createElement("p");
-  bio.textContent=person.bio||"No bio added yet.";
-
-  const interests=document.createElement("p");
-  interests.textContent="Interests: "+(person.interests||[]).join(", ");
-
-  const status=document.createElement("p");
-  status.className="status";
-
-  const lastSeen=person.last_seen_at
-   ?new Date(person.last_seen_at).getTime():0;
-
-  const online=lastSeen>0&&Date.now()-lastSeen<120000;
-
-  status.innerHTML=online
-   ?'<span class="online-dot"></span>Online'
-   :'<span class="offline-dot"></span>Offline';
-
-  const likeButton=document.createElement("button");
-  likeButton.textContent="❤️ Like";
-  likeButton.onclick=()=>likePerson(person.id,likeButton);
-
-  card.append(name,details,locationText,status,bio,interests,likeButton);
-  list.appendChild(card);
  });
 }
 
-async function likePerson(personId,button){
- if(!currentUser){
-  alert("Please log in first.");
-  return;
+function updateUndoButton(){
+ document.getElementById("undoArea").style.display=
+  lastDislikedPerson?"block":"none";
+}
+
+function dislikePerson(){
+ if(discoverPeople.length===0)return;
+
+ const person=discoverPeople[0];
+ const disliked=getDisliked();
+
+ if(!disliked.includes(person.id)){
+  disliked.push(person.id);
+  saveDisliked(disliked);
  }
 
- button.disabled=true;
- button.textContent="Sending...";
+ lastDislikedPerson=person;
+ discoverPeople.shift();
+
+ updateUndoButton();
+ renderDiscover();
+}
+
+function undoDislike(){
+ if(!lastDislikedPerson)return;
+
+ const disliked=getDisliked();
+ saveDisliked(disliked.filter(id=>id!==lastDislikedPerson.id));
+
+ discoverPeople.unshift(lastDislikedPerson);
+ lastDislikedPerson=null;
+
+ updateUndoButton();
+ renderDiscover();
+}
+
+async function likePerson(personId,button){
+ if(!currentUser){alert("Please log in first.");return;}
+
+ if(button){
+  button.disabled=true;
+  button.textContent="Sending...";
+ }
 
  const {error}=await db.from("likes").insert({
   liker_id:currentUser.id,
@@ -639,40 +736,40 @@ async function likePerson(personId,button){
  });
 
  if(error){
-  button.textContent=error.code==="23505"
-   ?"Already Liked ❤️":"Try Again";
+  if(error.code==="23505"){
+   alert("You have already liked this person.");
+  }else{
+   alert("Like failed: "+error.message);
+  }
 
-  if(error.code!=="23505"){
-   alert(error.message);
+  if(button){
    button.disabled=false;
+   button.textContent="❤️";
   }
   return;
  }
 
- button.textContent="Liked ❤️";
+ discoverPeople=discoverPeople.filter(person=>person.id!==personId);
+ renderDiscover();
 }
 
 async function loadLikes(){
  showOnly("discoverCard");
  setActiveNav("navLikes");
+ document.getElementById("filterPanel").style.display="none";
+ document.getElementById("undoArea").style.display="none";
 
  const list=document.getElementById("discoverList");
 
- if(!currentUser){
-  list.textContent="Please log in first.";
-  return;
- }
+ if(!currentUser){list.textContent="Please log in first.";return;}
 
- list.textContent="Checking your likes...";
+ list.innerHTML='<p class="empty">Checking your likes...</p>';
 
  const {data,error}=await db.from("likes")
   .select("liker_id")
   .eq("liked_id",currentUser.id);
 
- if(error){
-  list.textContent="Error: "+error.message;
-  return;
- }
+ if(error){list.textContent="Error: "+error.message;return;}
 
  list.replaceChildren();
 
@@ -681,60 +778,67 @@ async function loadLikes(){
   return;
  }
 
- for(const like of data){
-  const {data:person}=await db.from("profiles")
-   .select("full_name,age,location,bio,avatar_url")
-   .eq("id",like.liker_id)
+ const uniqueIds=[...new Set(data.map(item=>item.liker_id))];
+
+ for(const personId of uniqueIds){
+  const {data:person,error:profileError}=await db.from("profiles")
+   .select("id,full_name,age,location,avatar_url")
+   .eq("id",personId)
    .maybeSingle();
 
-  if(!person)continue;
+  if(profileError||!person)continue;
 
-  const card=document.createElement("div");
-  card.className="card";
+  const row=document.createElement("div");
+  row.className="compact-like";
 
   if(person.avatar_url){
    const photo=document.createElement("img");
    photo.src=person.avatar_url;
-   photo.className="profile-photo";
-   card.appendChild(photo);
+   photo.alt="Profile photo";
+   row.appendChild(photo);
+  }else{
+   const placeholder=document.createElement("div");
+   placeholder.className="no-photo";
+   placeholder.textContent="❤️";
+   row.appendChild(placeholder);
   }
+
+  const info=document.createElement("div");
+  info.className="compact-like-info";
 
   const name=document.createElement("h3");
   name.textContent=person.full_name||"LoveConnect Member";
 
   const details=document.createElement("p");
-  details.textContent=(person.age?person.age+" years old":"")
+  details.textContent=(person.age?person.age+" years old":"Age not added")
    +" • "+(person.location||"Location not added");
 
-  const bio=document.createElement("p");
-  bio.textContent=person.bio||"No bio added yet.";
+  const label=document.createElement("p");
+  label.textContent="❤️ Liked you";
 
-  card.append(name,details,bio);
-  list.appendChild(card);
+  info.append(name,details,label);
+  row.appendChild(info);
+  list.appendChild(row);
  }
 }
 
 async function loadMatches(){
  showOnly("discoverCard");
  setActiveNav("navMatches");
+ document.getElementById("filterPanel").style.display="none";
+ document.getElementById("undoArea").style.display="none";
 
  const list=document.getElementById("discoverList");
 
- if(!currentUser){
-  list.textContent="Please log in first.";
-  return;
- }
+ if(!currentUser){list.textContent="Please log in first.";return;}
 
- list.textContent="Loading your matches...";
+ list.innerHTML='<p class="empty">Loading your matches...</p>';
 
  const {data,error}=await db.from("matches")
   .select("*")
   .or("user1_id.eq."+currentUser.id+",user2_id.eq."+currentUser.id);
 
- if(error){
-  list.textContent="Error: "+error.message;
-  return;
- }
+ if(error){list.textContent="Error: "+error.message;return;}
 
  list.replaceChildren();
 
@@ -744,34 +848,44 @@ async function loadMatches(){
  }
 
  for(const match of data){
-  const otherId=match.user1_id===currentUser.id
-   ?match.user2_id:match.user1_id;
+  const otherId=match.user1_id===currentUser.id?match.user2_id:match.user1_id;
 
   const {data:person}=await db.from("profiles")
-   .select("full_name,avatar_url")
-   .eq("id",otherId)
-   .maybeSingle();
+   .select("full_name,avatar_url,age,location")
+   .eq("id",otherId).maybeSingle();
 
   if(!person)continue;
 
   const card=document.createElement("div");
-  card.className="card";
+  card.className="compact-like";
 
   if(person.avatar_url){
    const photo=document.createElement("img");
    photo.src=person.avatar_url;
-   photo.className="profile-photo";
    card.appendChild(photo);
+  }else{
+   const placeholder=document.createElement("div");
+   placeholder.className="no-photo";
+   placeholder.textContent="❤️";
+   card.appendChild(placeholder);
   }
 
+  const info=document.createElement("div");
+  info.className="compact-like-info";
+
   const name=document.createElement("h3");
-  name.textContent="❤️ "+person.full_name;
+  name.textContent="💕 "+(person.full_name||"LoveConnect Member");
+
+  const details=document.createElement("p");
+  details.textContent=(person.age?person.age+" years old":"")
+   +" • "+(person.location||"Location not added");
 
   const chatButton=document.createElement("button");
   chatButton.textContent="Open Chat 💬";
   chatButton.onclick=()=>openChat(match.id,person.full_name);
 
-  card.append(name,chatButton);
+  info.append(name,details,chatButton);
+  card.appendChild(info);
   list.appendChild(card);
  }
 }
@@ -782,12 +896,9 @@ async function loadNotifications(){
 
  const list=document.getElementById("notificationList");
 
- if(!currentUser){
-  list.textContent="Please log in first.";
-  return;
- }
+ if(!currentUser){list.textContent="Please log in first.";return;}
 
- list.textContent="Loading notifications...";
+ list.innerHTML='<p class="empty">Loading notifications...</p>';
 
  const {data,error}=await db.from("notifications")
   .select("*")
@@ -795,10 +906,7 @@ async function loadNotifications(){
   .order("created_at",{ascending:false})
   .limit(50);
 
- if(error){
-  list.textContent="Error: "+error.message;
-  return;
- }
+ if(error){list.textContent="Error: "+error.message;return;}
 
  list.replaceChildren();
 
@@ -814,8 +922,7 @@ async function loadNotifications(){
   if(!notification.is_read)card.classList.add("unread");
 
   const title=document.createElement("h3");
-  title.textContent=notification.type==="like"
-   ?"💌 New Like":"💬 New Message";
+  title.textContent=notification.type==="like"?"💌 New Like":"💬 New Message";
 
   const message=document.createElement("p");
   message.textContent=notification.message;
@@ -836,12 +943,8 @@ async function loadNotifications(){
      .eq("id",notification.id)
      .eq("recipient_id",currentUser.id);
 
-    if(updateError){
-     alert(updateError.message);
-    }else{
-     card.classList.remove("unread");
-     readButton.remove();
-    }
+    if(updateError){alert(updateError.message);}
+    else{card.classList.remove("unread");readButton.remove();}
    };
 
    card.appendChild(readButton);
@@ -861,7 +964,6 @@ async function openChat(matchId,personName){
  }
 
  showOnly("chatCard");
-
  document.getElementById("chatTitle").textContent="💬 Chat with "+personName;
 
  const input=document.getElementById("chatInput");
@@ -874,7 +976,6 @@ async function openChat(matchId,personName){
  };
 
  await loadMessages();
-
  messageRefreshTimer=setInterval(loadMessages,5000);
 }
 
@@ -892,7 +993,6 @@ async function loadMessages(){
  if(!currentUser||!currentMatchId||loadingMessages)return;
 
  loadingMessages=true;
-
  const box=document.getElementById("chatMessages");
  const thisMatchId=currentMatchId;
 
@@ -904,10 +1004,7 @@ async function loadMessages(){
 
   if(thisMatchId!==currentMatchId)return;
 
-  if(error){
-   box.textContent="Unable to load messages: "+error.message;
-   return;
-  }
+  if(error){box.textContent="Unable to load messages: "+error.message;return;}
 
   const snapshot=JSON.stringify(data||[]);
   if(snapshot===lastMessagesSnapshot)return;
@@ -924,8 +1021,7 @@ async function loadMessages(){
    const item=document.createElement("div");
 
    item.className=message.sender_id===currentUser.id
-    ?"message-bubble my-message"
-    :"message-bubble their-message";
+    ?"message-bubble my-message":"message-bubble their-message";
 
    const text=document.createElement("div");
    text.textContent=message.content;
@@ -968,10 +1064,7 @@ async function sendMessage(){
    content:content
   });
 
-  if(error){
-   alert("Message not sent: "+error.message);
-   return;
-  }
+  if(error){alert("Message not sent: "+error.message);return;}
 
   input.value="";
   lastMessagesSnapshot="";
