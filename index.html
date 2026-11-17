@@ -470,9 +470,14 @@ async function saveProfile(){
   ?"Error: "+error.message
   :"Your profile has been saved successfully! ❤️";
 
- document.getElementById("avatar").value="";
-}
+document.getElementById("avatar").value="";
 
+if(!error && avatarUrl){
+ const photo=document.getElementById("myProfilePhoto");
+ photo.src=avatarUrl;
+ photo.style.display="block";
+}
+ }
 async function logout(){
  if(presenceTimer){
   clearInterval(presenceTimer);
