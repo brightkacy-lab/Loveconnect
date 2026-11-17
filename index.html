@@ -5,6 +5,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LoveConnect</title>
+<link rel="manifest" href="/Loveconnect/manifest.json">
+<meta name="theme-color" content="#e83e70">
+<link rel="icon" href="/Loveconnect/icons/loveconnect.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/Loveconnect/icons/loveconnect.svg">
 
 <style>
 *{box-sizing:border-box}
@@ -137,6 +141,8 @@ small{color:#777}
 <header>
 <h1>❤️ LoveConnect</h1>
 <p>Meet people. Make connections.</p>
+<button id="installAppBtn" class="light-button" style="display:none;max-width:230px;margin:12px auto 0" onclick="installLoveConnect()">⬇️ Install LoveConnect</button>
+<p id="installHelp" style="display:none;font-size:12px;margin:8px 0 0">To install, open your browser menu and choose Install app or Add to Home screen.</p>
 </header>
 
 <main>
@@ -1088,6 +1094,29 @@ async function checkLogin(){
  }
 }
 
+let loveConnectInstallPrompt=null;
+window.addEventListener("beforeinstallprompt",event=>{
+ event.preventDefault();
+ loveConnectInstallPrompt=event;
+ const installButton=document.getElementById("installAppBtn");
+ if(installButton)installButton.style.display="block";
+});
+async function installLoveConnect(){
+ if(loveConnectInstallPrompt){
+  loveConnectInstallPrompt.prompt();
+  await loveConnectInstallPrompt.userChoice;
+  loveConnectInstallPrompt=null;
+  document.getElementById("installAppBtn").style.display="none";
+ }else{
+  document.getElementById("installHelp").style.display="block";
+ }
+}
+if("serviceWorker" in navigator){
+ window.addEventListener("load",()=>{
+  navigator.serviceWorker.register("/Loveconnect/service-worker.js",{scope:"/Loveconnect/"})
+   .catch(error=>console.log("App worker registration failed:",error));
+ });
+}
 checkLogin();
 </script>
 
