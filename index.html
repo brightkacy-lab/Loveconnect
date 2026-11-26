@@ -96,7 +96,7 @@ small{color:#777}
  touch-action:pan-y;user-select:none;
 }
 .discover-card img{
- width:100%;height:360px;max-height:55vh;
+ display:block;width:100%;height:420px;max-height:65vh;
  object-fit:cover;border-radius:14px;
 }
 .discover-card.no-photo{
@@ -215,9 +215,10 @@ style="display:none" alt="My profile picture">
 <!-- DISCOVER -->
 <div class="card" id="discoverCard">
 <h2>❤️ Discover Singles</h2>
+<button class="light-button" id="toggleSearchButton" onclick="toggleDiscoverSearch()" aria-expanded="false">🔎 Search</button>
 <p>Swipe right to like or left to dislike.</p>
 
-<div id="filterPanel">
+<div id="filterPanel" style="display:none">
 <h3>Search Filters</h3>
 <div class="filter-grid">
 <input id="minAge" type="number" placeholder="Minimum age">
@@ -232,7 +233,7 @@ style="display:none" alt="My profile picture">
 </select>
 
 <input id="filterLocation" placeholder="Search city or country">
-<button onclick="loadDiscover()">Search Members 🔎</button>
+<button onclick="loadDiscover()">Find Members</button>
 <button class="light-button" onclick="clearFilters()">Clear Filters</button>
 </div>
 
@@ -695,6 +696,15 @@ async function loadDiscover(){
  lastDislikedPerson=null;
  updateUndoButton();
  renderDiscover();
+}
+
+function toggleDiscoverSearch(){
+ const panel=document.getElementById("filterPanel");
+ const button=document.getElementById("toggleSearchButton");
+ if(!panel||!button)return;
+ const opening=panel.style.display==="none";
+ panel.style.display=opening?"block":"none";
+ button.setAttribute("aria-expanded",String(opening));
 }
 
 function renderDiscover(){
