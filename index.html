@@ -179,6 +179,11 @@ style="display:none" alt="My profile picture">
 </div>
 
 <button onclick="editProfile()">✏️ Edit Profile</button>
+<button class="light-button" onclick="loadBlockedMembers()">🚫 Manage Blocked Members</button>
+<div id="blockedMembersSection" style="display:none;margin-top:12px">
+<h3>Blocked Members</h3>
+<div id="blockedMembersList"></div>
+</div>
 </div>
 
 <div id="profileEditor" style="display:none">
@@ -254,6 +259,8 @@ style="display:none" alt="My profile picture">
 <div id="chatMessages"></div>
 <textarea id="chatInput" placeholder="Write a message..."></textarea>
 <button onclick="sendMessage()">Send Message ❤️</button>
+<button class="light-button" onclick="blockChatPartner()">🚫 Block Member</button>
+<button class="light-button" onclick="reportChatPartner()">⚑ Report Member</button>
 <button class="secondary" onclick="backToMatches()">Back to Matches</button>
 </div>
 
@@ -277,6 +284,8 @@ const db=window.supabase.createClient(
 
 let currentUser=null;
 let currentMatchId=null;
+let currentChatPartnerId=null;
+let currentChatPartnerName="";
 let messageRefreshTimer=null;
 let presenceTimer=null;
 let loadingMessages=false;
@@ -518,6 +527,8 @@ async function logout(){
  await db.auth.signOut();
  currentUser=null;
  currentMatchId=null;
+ currentChatPartnerId=null;
+ currentChatPartnerName="";
  discoverPeople=[];
  lastDislikedPerson=null;
 
@@ -540,6 +551,88 @@ async function startPresence(){
  await updatePresence();
  if(presenceTimer)clearInterval(presenceTimer);
  presenceTimer=setInterval(updatePresence,60000);
+}
+
+async function getBlockedUserIds(){
+ if(!currentUser)return [];
+ const {data,error}=await db.from("blocks")
+  .select("blocker_id,blocked_id")
+  .or("blocker_id.eq."+currentUser.id+",blocked_id.eq."+currentUser.id);
+ if(error)throw error;
+ return (data||[]).map(row=>
+  row.blocker_id===currentUser.id?row.blocked_id:row.blocker_id
+ );
+}
+
+async function blockPerson(personId,personName){
+ if(!currentUser||!personId||personId===currentUser.id)return;
+ if(!confirm("Block "+(personName||"this member")+"? They will no longer be able to like or message each other."))return;
+ const {data:existing,error:checkError}=await db.from("blocks")
+  .select("id").eq("blocker_id",currentUser.id).eq("blocked_id",personId).maybeSingle();
+ if(checkError){alert("Could not check block status: "+checkError.message);return;}
+ if(!existing){
+  const {error}=await db.from("blocks").insert({blocker_id:currentUser.id,blocked_id:personId});
+  if(error){alert("Block failed: "+error.message);return;}
+ }
+ alert("Member blocked.");
+ if(currentChatPartnerId===personId)await backToMatches();
+ else if(document.getElementById("navDiscover").classList.contains("active"))await loadDiscover();
+ else if(document.getElementById("navLikes").classList.contains("active"))await loadLikes();
+ else if(document.getElementById("navMatches").classList.contains("active"))await loadMatches();
+}
+
+async function unblockPerson(personId,personName){
+ if(!currentUser||!personId)return;
+ if(!confirm("Unblock "+(personName||"this member")+"?"))return;
+ const {error}=await db.from("blocks").delete()
+  .eq("blocker_id",currentUser.id).eq("blocked_id",personId);
+ if(error){alert("Unblock failed: "+error.message);return;}
+ await loadBlockedMembers();
+}
+
+async function loadBlockedMembers(){
+ const section=document.getElementById("blockedMembersSection");
+ const list=document.getElementById("blockedMembersList");
+ section.style.display="block";
+ list.textContent="Loading blocked members...";
+ const {data:blocks,error}=await db.from("blocks")
+  .select("blocked_id").eq("blocker_id",currentUser.id);
+ if(error){list.textContent="Unable to load blocked members: "+error.message;return;}
+ list.replaceChildren();
+ if(!blocks||blocks.length===0){list.textContent="You have not blocked anyone.";return;}
+ for(const item of blocks){
+  const {data:person}=await db.from("profiles")
+   .select("id,full_name").eq("id",item.blocked_id).maybeSingle();
+  const row=document.createElement("div");
+  row.className="compact-like";
+  const name=document.createElement("strong");
+  name.textContent=person?.full_name||"LoveConnect Member";
+  const button=document.createElement("button");
+  button.className="light-button";
+  button.textContent="Unblock";
+  button.onclick=()=>unblockPerson(item.blocked_id,name.textContent);
+  row.append(name,button);
+  list.appendChild(row);
+ }
+}
+
+async function reportPerson(personId,personName){
+ if(!currentUser||!personId||personId===currentUser.id)return;
+ const reason=prompt("Why are you reporting "+(personName||"this member")+"? Please briefly explain.");
+ if(reason===null)return;
+ if(!reason.trim()){alert("Please enter a reason for the report.");return;}
+ const {error}=await db.from("reports").insert({
+  reporter_id:currentUser.id,reported_id:personId,reason:reason.trim().slice(0,1000)
+ });
+ if(error){alert("Report failed: "+error.message);return;}
+ alert("Thank you. Your report has been submitted.");
+}
+
+async function blockChatPartner(){
+ await blockPerson(currentChatPartnerId,currentChatPartnerName);
+}
+async function reportChatPartner(){
+ await reportPerson(currentChatPartnerId,currentChatPartnerName);
 }
 
 function clearFilters(){
@@ -580,6 +673,9 @@ async function loadDiscover(){
  if(gender)query=query.eq("gender",gender);
  if(location)query=query.ilike("location","%"+location+"%");
 
+ let blockedIds;
+ try{blockedIds=await getBlockedUserIds();}
+ catch(blockError){list.textContent="Unable to check blocked members: "+blockError.message;return;}
  const [{data,error},{data:myLikes, error:likeError}]=await Promise.all([
   query,
   db.from("likes").select("liked_id").eq("liker_id",currentUser.id)
@@ -592,6 +688,7 @@ async function loadDiscover(){
  const disliked=getDisliked();
 
  discoverPeople=(data||[]).filter(person=>
+  !blockedIds.includes(person.id)&&
   !alreadyLiked.includes(person.id)&&!disliked.includes(person.id)
  );
 
@@ -654,6 +751,19 @@ function renderDiscover(){
   ?'<span class="online-dot"></span>Online'
   :'<span class="offline-dot"></span>Offline';
 
+ const safetyActions=document.createElement("div");
+ safetyActions.style.display="flex";
+ safetyActions.style.gap="8px";
+ const blockButton=document.createElement("button");
+ blockButton.className="light-button";
+ blockButton.textContent="🚫 Block";
+ blockButton.onclick=()=>blockPerson(person.id,person.full_name);
+ const reportButton=document.createElement("button");
+ reportButton.className="light-button";
+ reportButton.textContent="⚑ Report";
+ reportButton.onclick=()=>reportPerson(person.id,person.full_name);
+ safetyActions.append(blockButton,reportButton);
+
  const actions=document.createElement("div");
  actions.className="discover-actions";
 
@@ -670,7 +780,7 @@ function renderDiscover(){
  like.onclick=()=>likePerson(person.id,like);
 
  actions.append(dislike,like);
- card.append(name,details,place,status,bio,interests,actions);
+ card.append(name,details,place,status,bio,interests,safetyActions,actions);
  list.appendChild(card);
 
  card.addEventListener("pointerdown",event=>{
@@ -771,6 +881,9 @@ async function loadLikes(){
 
  list.innerHTML='<p class="empty">Checking your likes...</p>';
 
+ let blockedIds;
+ try{blockedIds=await getBlockedUserIds();}
+ catch(blockError){list.textContent="Unable to check blocked members: "+blockError.message;return;}
  const {data,error}=await db.from("likes")
   .select("liker_id")
   .eq("liked_id",currentUser.id);
@@ -784,7 +897,8 @@ async function loadLikes(){
   return;
  }
 
- const uniqueIds=[...new Set(data.map(item=>item.liker_id))];
+ const uniqueIds=[...new Set(data.map(item=>item.liker_id))]
+  .filter(personId=>!blockedIds.includes(personId));
 
  for(const personId of uniqueIds){
   const {data:person,error:profileError}=await db.from("profiles")
@@ -821,8 +935,18 @@ async function loadLikes(){
 
   const label=document.createElement("p");
   label.textContent="❤️ Liked you";
+  const safety=document.createElement("div");
+  const blockButton=document.createElement("button");
+  blockButton.className="light-button";
+  blockButton.textContent="🚫 Block";
+  blockButton.onclick=()=>blockPerson(person.id,person.full_name);
+  const reportButton=document.createElement("button");
+  reportButton.className="light-button";
+  reportButton.textContent="⚑ Report";
+  reportButton.onclick=()=>reportPerson(person.id,person.full_name);
+  safety.append(blockButton,reportButton);
 
-  info.append(name,details,label);
+  info.append(name,details,label,safety);
   row.appendChild(info);
   list.appendChild(row);
  }
@@ -840,6 +964,9 @@ async function loadMatches(){
 
  list.innerHTML='<p class="empty">Loading your matches...</p>';
 
+ let blockedIds;
+ try{blockedIds=await getBlockedUserIds();}
+ catch(blockError){list.textContent="Unable to check blocked members: "+blockError.message;return;}
  const {data,error}=await db.from("matches")
   .select("*")
   .or("user1_id.eq."+currentUser.id+",user2_id.eq."+currentUser.id);
@@ -855,6 +982,7 @@ async function loadMatches(){
 
  for(const match of data){
   const otherId=match.user1_id===currentUser.id?match.user2_id:match.user1_id;
+  if(blockedIds.includes(otherId))continue;
 
   const {data:person}=await db.from("profiles")
    .select("full_name,avatar_url,age,location")
@@ -888,9 +1016,19 @@ async function loadMatches(){
 
   const chatButton=document.createElement("button");
   chatButton.textContent="Open Chat 💬";
-  chatButton.onclick=()=>openChat(match.id,person.full_name);
+  chatButton.onclick=()=>openChat(match.id,person.full_name,otherId);
+  const safety=document.createElement("div");
+  const blockButton=document.createElement("button");
+  blockButton.className="light-button";
+  blockButton.textContent="🚫 Block";
+  blockButton.onclick=()=>blockPerson(otherId,person.full_name);
+  const reportButton=document.createElement("button");
+  reportButton.className="light-button";
+  reportButton.textContent="⚑ Report";
+  reportButton.onclick=()=>reportPerson(otherId,person.full_name);
+  safety.append(blockButton,reportButton);
 
-  info.append(name,details,chatButton);
+  info.append(name,details,chatButton,safety);
   card.appendChild(info);
   list.appendChild(card);
  }
@@ -960,9 +1098,18 @@ async function loadNotifications(){
  }
 }
 
-async function openChat(matchId,personName){
+async function openChat(matchId,personName,otherId){
  currentMatchId=matchId;
+ currentChatPartnerId=otherId;
+ currentChatPartnerName=personName||"LoveConnect Member";
  lastMessagesSnapshot="";
+ let blockedIds;
+ try{blockedIds=await getBlockedUserIds();}
+ catch(blockError){alert("Unable to verify block status: "+blockError.message);currentMatchId=null;return;}
+ if(blockedIds.includes(otherId)){
+  alert("You cannot open this chat because one of you has blocked the other.");
+  currentMatchId=null;return;
+ }
 
  if(messageRefreshTimer){
   clearInterval(messageRefreshTimer);
@@ -992,11 +1139,26 @@ async function backToMatches(){
  }
 
  currentMatchId=null;
+ currentChatPartnerId=null;
+ currentChatPartnerName="";
  await loadMatches();
 }
 
 async function loadMessages(){
  if(!currentUser||!currentMatchId||loadingMessages)return;
+ if(currentChatPartnerId){
+  try{
+   const blocked=await getBlockedUserIds();
+   if(blocked.includes(currentChatPartnerId)){
+    document.getElementById("chatMessages").textContent="This chat is unavailable because one of you has blocked the other.";
+    if(messageRefreshTimer){clearInterval(messageRefreshTimer);messageRefreshTimer=null;}
+    return;
+   }
+  }catch(blockError){
+   document.getElementById("chatMessages").textContent="Unable to verify chat permissions.";
+   return;
+  }
+ }
 
  loadingMessages=true;
  const box=document.getElementById("chatMessages");
@@ -1058,6 +1220,15 @@ async function sendMessage(){
  const content=input.value.trim();
 
  if(!content||!currentMatchId||!currentUser)return;
+ if(currentChatPartnerId){
+  try{
+   const blocked=await getBlockedUserIds();
+   if(blocked.includes(currentChatPartnerId)){
+    alert("This message cannot be sent because one of you has blocked the other.");
+    return;
+   }
+  }catch(blockError){alert("Unable to verify block status. Please try again.");return;}
+ }
 
  const button=document.querySelector("#chatCard button:not(.secondary)");
  button.disabled=true;
