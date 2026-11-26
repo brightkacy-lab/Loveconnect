@@ -46,6 +46,11 @@ button{
 button:disabled{opacity:.6}
 .secondary{background:#555}
 .light-button{background:#fce0e9;color:#bd285d}
+.discover-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.discover-heading h2{margin:5px 0}
+.discover-search-button{width:42px;height:42px;flex:0 0 42px;padding:0;margin:0;border:1px solid #f3c3d2;border-radius:12px;background:#fff0f4;color:#bd285d;display:flex;align-items:center;justify-content:center}
+.discover-search-button:active,.discover-search-button[aria-expanded="true"]{background:#fce0e9}
+.discover-search-button svg{width:21px;height:21px}
 .dislike-button{background:#555}
 .undo-button{background:#fff0f4;color:#bd285d}
 nav{
@@ -214,8 +219,12 @@ style="display:none" alt="My profile picture">
 
 <!-- DISCOVER -->
 <div class="card" id="discoverCard">
+<div class="discover-heading">
 <h2>❤️ Discover Singles</h2>
-<button class="light-button" id="toggleSearchButton" onclick="toggleDiscoverSearch()" aria-expanded="false">🔎 Search</button>
+<button class="discover-search-button" id="toggleSearchButton" onclick="toggleDiscoverSearch()" aria-label="Open search and filters" title="Search and filters" aria-expanded="false">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="white"/><circle cx="15" cy="12" r="2" fill="white"/><circle cx="8" cy="18" r="2" fill="white"/></svg>
+</button>
+</div>
 <p>Swipe right to like or left to dislike.</p>
 
 <div id="filterPanel" style="display:none">
