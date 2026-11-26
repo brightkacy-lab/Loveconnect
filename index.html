@@ -96,7 +96,7 @@ small{color:#777}
  touch-action:pan-y;user-select:none;
 }
 .discover-card img{
- width:100%;height:360px;max-height:55vh;
+ display:block;width:100%;height:420px;max-height:65vh;
  object-fit:cover;border-radius:14px;
 }
 .discover-card.no-photo{
@@ -215,9 +215,10 @@ style="display:none" alt="My profile picture">
 <!-- DISCOVER -->
 <div class="card" id="discoverCard">
 <h2>❤️ Discover Singles</h2>
+<button class="light-button" id="toggleSearchButton" onclick="toggleDiscoverSearch()" aria-expanded="false">🔎 Search</button>
 <p>Swipe right to like or left to dislike.</p>
 
-<div id="filterPanel">
+<div id="filterPanel" style="display:none">
 <h3>Search Filters</h3>
 <div class="filter-grid">
 <input id="minAge" type="number" placeholder="Minimum age">
@@ -232,7 +233,7 @@ style="display:none" alt="My profile picture">
 </select>
 
 <input id="filterLocation" placeholder="Search city or country">
-<button onclick="loadDiscover()">Search Members 🔎</button>
+<button onclick="loadDiscover()">Find Members</button>
 <button class="light-button" onclick="clearFilters()">Clear Filters</button>
 </div>
 
@@ -697,6 +698,15 @@ async function loadDiscover(){
  renderDiscover();
 }
 
+function toggleDiscoverSearch(){
+ const panel=document.getElementById("filterPanel");
+ const button=document.getElementById("toggleSearchButton");
+ if(!panel||!button)return;
+ const opening=panel.style.display==="none";
+ panel.style.display=opening?"block":"none";
+ button.setAttribute("aria-expanded",String(opening));
+}
+
 function renderDiscover(){
  const list=document.getElementById("discoverList");
  list.replaceChildren();
@@ -752,8 +762,28 @@ function renderDiscover(){
   :'<span class="offline-dot"></span>Offline';
 
  const safetyActions=document.createElement("div");
+ safetyActions.style.position="relative";
  safetyActions.style.display="flex";
- safetyActions.style.gap="8px";
+ safetyActions.style.justifyContent="flex-end";
+ safetyActions.style.margin="8px 0";
+ const moreButton=document.createElement("button");
+ moreButton.className="light-button";
+ moreButton.textContent="⋯ More";
+ moreButton.setAttribute("aria-label","More profile actions");
+ moreButton.setAttribute("aria-expanded","false");
+ const safetyMenu=document.createElement("div");
+ safetyMenu.style.display="none";
+ safetyMenu.style.flexDirection="column";
+ safetyMenu.style.gap="6px";
+ safetyMenu.style.position="absolute";
+ safetyMenu.style.right="0";
+ safetyMenu.style.top="100%";
+ safetyMenu.style.zIndex="5";
+ safetyMenu.style.padding="8px";
+ safetyMenu.style.background="white";
+ safetyMenu.style.border="1px solid #ddd";
+ safetyMenu.style.borderRadius="10px";
+ safetyMenu.style.boxShadow="0 4px 12px rgba(0,0,0,.15)";
  const blockButton=document.createElement("button");
  blockButton.className="light-button";
  blockButton.textContent="🚫 Block";
@@ -762,8 +792,14 @@ function renderDiscover(){
  reportButton.className="light-button";
  reportButton.textContent="⚑ Report";
  reportButton.onclick=()=>reportPerson(person.id,person.full_name);
- safetyActions.append(blockButton,reportButton);
-
+ moreButton.onclick=()=>{
+  const opening=safetyMenu.style.display==="none";
+  safetyMenu.style.display=opening?"flex":"none";
+  moreButton.setAttribute("aria-expanded",String(opening));
+ };
+ safetyMenu.append(blockButton,reportButton);
+ safetyActions.append(moreButton,safetyMenu);
+ 
  const actions=document.createElement("div");
  actions.className="discover-actions";
 
