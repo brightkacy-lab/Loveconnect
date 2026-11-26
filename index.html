@@ -48,6 +48,9 @@ button:disabled{opacity:.6}
 .light-button{background:#fce0e9;color:#bd285d}
 .discover-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
 .discover-heading h2{margin:5px 0}
+#discoverCard>.discover-instructions{display:none}
+#discoverCard{padding:10px}
+
 .discover-search-button{width:42px;height:42px;flex:0 0 42px;padding:0;margin:0;border:1px solid #f3c3d2;border-radius:12px;background:#fff0f4;color:#bd285d;display:flex;align-items:center;justify-content:center}
 .discover-search-button:active,.discover-search-button[aria-expanded="true"]{background:#fce0e9}
 .discover-search-button svg{width:21px;height:21px}
@@ -97,12 +100,35 @@ small{color:#777}
  border-radius:50%;display:block;margin:10px auto;
 }
 .discover-card{
- padding:12px;overflow:hidden;
+ position:relative;padding:0;overflow:hidden;
+ height:calc(100dvh - 235px);min-height:430px;
+ border-radius:18px;background:#fce0e9;
  touch-action:pan-y;user-select:none;
 }
 .discover-card img{
- display:block;width:100%;height:420px;max-height:65vh;
- object-fit:cover;border-radius:14px;
+ display:block;position:absolute;inset:0;
+ width:100%;height:100%;max-height:none;
+ object-fit:cover;border-radius:18px;
+}
+.discover-card .discover-name{
+ position:absolute;left:18px;right:18px;bottom:91px;
+ z-index:2;color:white;font-size:27px;margin:0;
+ text-shadow:0 2px 8px #000b;
+}
+.discover-card .discover-info{
+ position:absolute;left:18px;bottom:65px;z-index:2;
+ color:white;font-size:16px;margin:0;
+ text-shadow:0 2px 8px #000b;
+}
+.discover-card .discover-actions{
+ position:absolute;left:0;right:0;bottom:12px;z-index:3;
+ margin:0;
+}
+.discover-card .discover-actions button{
+ box-shadow:0 3px 12px #0004;
+}
+.discover-card .discover-safety{
+ position:absolute;top:12px;right:12px;z-index:4;
 }
 .discover-card.no-photo{
  min-height:220px;display:flex;
@@ -225,7 +251,7 @@ style="display:none" alt="My profile picture">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="white"/><circle cx="15" cy="12" r="2" fill="white"/><circle cx="8" cy="18" r="2" fill="white"/></svg>
 </button>
 </div>
-<p>Swipe right to like or left to dislike.</p>
+<p class="discover-instructions">Swipe right to like or left to dislike.</p>
 
 <div id="filterPanel" style="display:none">
 <h3>Filters</h3>
@@ -771,6 +797,7 @@ function renderDiscover(){
   :'<span class="offline-dot"></span>Offline';
 
  const safetyActions=document.createElement("div");
+ safetyActions.className="discover-safety";
  safetyActions.style.position="relative";
  safetyActions.style.display="flex";
  safetyActions.style.justifyContent="flex-end";
@@ -825,7 +852,7 @@ function renderDiscover(){
  like.onclick=()=>likePerson(person.id,like);
 
  actions.append(dislike,like);
- card.append(name,details,place,status,bio,interests,safetyActions,actions);
+ card.append(name,details,safetyActions,actions);
  list.appendChild(card);
 
  card.addEventListener("pointerdown",event=>{
