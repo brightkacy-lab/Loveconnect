@@ -214,6 +214,7 @@ style="display:none" alt="My profile picture">
 </div>
 
 <button onclick="editProfile()">✏️ Edit Profile</button>
+<p id="memberVerificationNotice" style="display:none;margin:14px 0;padding:12px;border-radius:12px;background:#f8fbff;color:#1769a8;font-weight:700;text-align:center">⏳ Verification Pending — Your request is awaiting admin review.</p>
 <div class="verification-panel" id="memberVerificationPanel">
 <h3>💙 Profile Verification</h3>
 <p id="verificationStatus">Check your verification status.</p>
@@ -472,25 +473,31 @@ async function showProfile(){
 async function loadVerificationStatus(){
  const adminId="ea3645fa-9e94-4f39-989b-62b1e849db25";
  const isAdmin=currentUser?.id===adminId;
+ const memberPanel=document.getElementById("memberVerificationPanel");
+ const pendingNotice=document.getElementById("memberVerificationNotice");
  document.getElementById("adminVerificationPanel").style.display=isAdmin?"block":"none";
- document.getElementById("memberVerificationPanel").style.display=isAdmin?"none":"block";
+ memberPanel.style.display=isAdmin?"none":"block";
+ pendingNotice.style.display="none";
  const {data:verified,error:verifiedError}=await db.from("verified_members").select("user_id").eq("user_id",currentUser.id).maybeSingle();
  if(verifiedError){document.getElementById("verificationStatus").textContent="Unable to check verification status.";return;}
  const badge=document.getElementById("myVerifiedBadge");badge.replaceChildren();
  if(verified){
   const tag=document.createElement("span");tag.className="verified-badge";tag.textContent="✓ Verified";badge.appendChild(tag);
-  document.getElementById("verificationStatus").textContent="Your profile is verified. Thank you!";
-  document.getElementById("verificationRequestButton").style.display="none";
-  document.getElementById("verificationMessage").style.display="none";
+  memberPanel.style.display="none";
  }else if(!isAdmin){
-  document.getElementById("verificationRequestButton").style.display="block";
-  document.getElementById("verificationMessage").style.display="block";
   const {data:requests,error:requestError}=await db.from("verification_requests").select("status,created_at").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(1);
   if(requestError){document.getElementById("verificationStatus").textContent="Unable to load your request status.";return;}
   const latest=requests?.[0];
-  if(latest?.status==="pending"){document.getElementById("verificationStatus").textContent="Your request is awaiting admin review.";document.getElementById("verificationRequestButton").style.display="none";}
-  else if(latest?.status==="rejected")document.getElementById("verificationStatus").textContent="Your previous request was not approved. You may submit another request.";
-  else document.getElementById("verificationStatus").textContent="Your profile is not verified yet.";
+  if(latest?.status==="pending"){
+   memberPanel.style.display="none";
+   pendingNotice.style.display="block";
+  }else{
+   memberPanel.style.display="block";
+   document.getElementById("verificationRequestButton").style.display="block";
+   document.getElementById("verificationMessage").style.display="block";
+   if(latest?.status==="rejected")document.getElementById("verificationStatus").textContent="Your previous request was not approved. You may submit another request.";
+   else document.getElementById("verificationStatus").textContent="Your profile is not verified yet.";
+  }
  }
  if(isAdmin)await loadAdminVerificationRequests();
 }
