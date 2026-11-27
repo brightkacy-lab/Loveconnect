@@ -95,6 +95,9 @@ small{color:#777}
 .empty{text-align:center;color:#777;padding:20px}
 .profile-details{line-height:1.7;overflow-wrap:anywhere}
 .profile-details p{margin:8px 0}
+.verified-badge{display:inline-flex;align-items:center;gap:4px;margin-left:7px;padding:3px 8px;border-radius:20px;background:#e7f2ff;color:#1769c2;font-size:12px;font-weight:700;vertical-align:middle}
+.verification-panel{margin-top:14px;padding:13px;border:1px solid #dce8f8;border-radius:12px;background:#f8fbff}
+.verification-request{padding:12px;margin:9px 0;border:1px solid #eee;border-radius:12px;background:#fff}
 .my-small-photo{
  width:90px;height:90px;object-fit:cover;
  border-radius:50%;display:block;margin:10px auto;
@@ -202,6 +205,7 @@ style="display:none" alt="My profile picture">
 
 <div class="profile-details">
 <h3 id="viewName" style="text-align:center"></h3>
+<p id="myVerifiedBadge" style="text-align:center"></p>
 <p id="viewAge"></p>
 <p id="viewGender"></p>
 <p id="viewLocation"></p>
@@ -210,6 +214,18 @@ style="display:none" alt="My profile picture">
 </div>
 
 <button onclick="editProfile()">✏️ Edit Profile</button>
+<div class="verification-panel" id="memberVerificationPanel">
+<h3>💙 Profile Verification</h3>
+<p id="verificationStatus">Check your verification status.</p>
+<textarea id="verificationMessage" maxlength="500" placeholder="Tell us why you would like your profile verified (optional)"></textarea>
+<button id="verificationRequestButton" onclick="submitVerificationRequest()">Request Free Verification</button>
+<small>Verification is free. Never send passwords or payment details.</small>
+</div>
+<div class="verification-panel" id="adminVerificationPanel" style="display:none">
+<h3>🛡️ Admin Verification Review</h3>
+<p>Review member requests and approve or reject them.</p>
+<div id="adminVerificationRequests">Loading requests...</div>
+</div>
 <button class="light-button" onclick="loadBlockedMembers()">🚫 Manage Blocked Members</button>
 <div id="blockedMembersSection" style="display:none;margin-top:12px">
 <h3>Blocked Members</h3>
@@ -421,6 +437,7 @@ async function showProfile(){
 
  if(data){
   document.getElementById("viewName").textContent=data.full_name||"LoveConnect Member";
+  await loadVerificationStatus();
   document.getElementById("viewAge").textContent=data.age?data.age+" years old":"Age not added";
   document.getElementById("viewGender").textContent="Gender: "+(data.gender||"Not added");
   document.getElementById("viewLocation").textContent="📍 "+(data.location||"Location not added");
@@ -450,6 +467,76 @@ async function showProfile(){
   document.getElementById("profileView").style.display="none";
   document.getElementById("profileEditor").style.display="block";
  }
+}
+
+async function loadVerificationStatus(){
+ const adminId="ea3645fa-9e94-4f39-989b-62b1e849db25";
+ const isAdmin=currentUser?.id===adminId;
+ document.getElementById("adminVerificationPanel").style.display=isAdmin?"block":"none";
+ document.getElementById("memberVerificationPanel").style.display=isAdmin?"none":"block";
+ const {data:verified,error:verifiedError}=await db.from("verified_members").select("user_id").eq("user_id",currentUser.id).maybeSingle();
+ if(verifiedError){document.getElementById("verificationStatus").textContent="Unable to check verification status.";return;}
+ const badge=document.getElementById("myVerifiedBadge");badge.replaceChildren();
+ if(verified){
+  const tag=document.createElement("span");tag.className="verified-badge";tag.textContent="✓ Verified";badge.appendChild(tag);
+  document.getElementById("verificationStatus").textContent="Your profile is verified. Thank you!";
+  document.getElementById("verificationRequestButton").style.display="none";
+  document.getElementById("verificationMessage").style.display="none";
+ }else if(!isAdmin){
+  document.getElementById("verificationRequestButton").style.display="block";
+  document.getElementById("verificationMessage").style.display="block";
+  const {data:requests,error:requestError}=await db.from("verification_requests").select("status,created_at").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(1);
+  if(requestError){document.getElementById("verificationStatus").textContent="Unable to load your request status.";return;}
+  const latest=requests?.[0];
+  if(latest?.status==="pending"){document.getElementById("verificationStatus").textContent="Your request is awaiting admin review.";document.getElementById("verificationRequestButton").style.display="none";}
+  else if(latest?.status==="rejected")document.getElementById("verificationStatus").textContent="Your previous request was not approved. You may submit another request.";
+  else document.getElementById("verificationStatus").textContent="Your profile is not verified yet.";
+ }
+ if(isAdmin)await loadAdminVerificationRequests();
+}
+
+async function submitVerificationRequest(){
+ const button=document.getElementById("verificationRequestButton");
+ const message=document.getElementById("verificationMessage").value.trim();
+ button.disabled=true;button.textContent="Submitting...";
+ const {data:existing,error:checkError}=await db.from("verification_requests").select("id").eq("user_id",currentUser.id).eq("status","pending").limit(1);
+ if(checkError){alert("Could not check existing requests: "+checkError.message);button.disabled=false;button.textContent="Request Free Verification";return;}
+ if(existing?.length){alert("You already have a pending request.");await loadVerificationStatus();return;}
+ const {error}=await db.from("verification_requests").insert({user_id:currentUser.id,message,status:"pending"});
+ if(error){alert("Request could not be submitted: "+error.message);button.disabled=false;button.textContent="Request Free Verification";return;}
+ document.getElementById("verificationMessage").value="";alert("Your free verification request has been submitted.");await loadVerificationStatus();
+}
+
+async function loadAdminVerificationRequests(){
+ const list=document.getElementById("adminVerificationRequests");
+ const {data,error}=await db.from("verification_requests").select("id,user_id,message,created_at,status").eq("status","pending").order("created_at",{ascending:true});
+ if(error){list.textContent="Unable to load requests: "+error.message;return;}
+ list.replaceChildren();if(!data?.length){list.textContent="No pending verification requests.";return;}
+ for(const request of data){
+  const {data:person}=await db.from("profiles").select("full_name,age,location").eq("id",request.user_id).maybeSingle();
+  const item=document.createElement("div");item.className="verification-request";
+  const heading=document.createElement("strong");heading.textContent=person?.full_name||"LoveConnect Member";
+  const details=document.createElement("p");details.textContent=(person?.age?person.age+" years old":"Age not listed")+" • "+(person?.location||"Location not listed");
+  const note=document.createElement("p");note.textContent=request.message||"No additional message.";
+  const approve=document.createElement("button");approve.textContent="✓ Approve";approve.onclick=()=>reviewVerificationRequest(request.id,"approved");
+  const reject=document.createElement("button");reject.className="light-button";reject.textContent="Reject";reject.onclick=()=>reviewVerificationRequest(request.id,"rejected");
+  item.append(heading,details,note,approve,reject);list.appendChild(item);
+ }
+}
+
+async function reviewVerificationRequest(requestId,status){
+ if(!confirm("Are you sure you want to "+(status==="approved"?"approve":"reject")+" this request?"))return;
+ const {error}=await db.from("verification_requests").update({status,reviewed_at:new Date().toISOString(),reviewed_by:currentUser.id}).eq("id",requestId);
+ if(error){alert("Review failed: "+error.message);return;}
+ alert("Verification request "+status+".");await loadAdminVerificationRequests();
+}
+
+async function revokeVerification(userId){
+ if(currentUser.id!=="ea3645fa-9e94-4f39-989b-62b1e849db25")return;
+ if(!confirm("Remove this member's verified badge?"))return;
+ const {error}=await db.from("verified_members").delete().eq("user_id",userId);
+ if(error){alert("Could not remove badge: "+error.message);return;}
+ alert("Verified badge removed.");await loadAdminVerificationRequests();
 }
 
 async function showMyProfile(){
@@ -752,6 +839,7 @@ function renderDiscover(){
  }
 
  const person=discoverPeople[0];
+ const {data:verifiedPerson}=await db.from("verified_members").select("user_id").eq("user_id",person.id).maybeSingle();
  const card=document.createElement("div");
  card.className="discover-card";
  card.id="swipeCard";
@@ -771,6 +859,7 @@ function renderDiscover(){
  const name=document.createElement("h2");
  name.className="discover-name";
  name.textContent=person.full_name||"LoveConnect Member";
+ if(verifiedPerson){const badge=document.createElement("span");badge.className="verified-badge";badge.textContent="✓ Verified";name.appendChild(badge);}
 
  const details=document.createElement("p");
  details.className="discover-info";
@@ -1000,6 +1089,8 @@ async function loadLikes(){
 
   const name=document.createElement("h3");
   name.textContent=person.full_name||"LoveConnect Member";
+  const {data:verifiedPerson}=await db.from("verified_members").select("user_id").eq("user_id",person.id).maybeSingle();
+  if(verifiedPerson){const badge=document.createElement("span");badge.className="verified-badge";badge.textContent="✓ Verified";name.appendChild(badge);}
 
   const details=document.createElement("p");
   details.textContent=(person.age?person.age+" years old":"Age not added")
@@ -1081,6 +1172,11 @@ async function loadMatches(){
 
   const name=document.createElement("h3");
   name.textContent="💕 "+(person.full_name||"LoveConnect Member");
+  const {data:verifiedPerson}=await db.from("verified_members").select("user_id").eq("user_id",otherId).maybeSingle();
+  if(verifiedPerson){const badge=document.createElement("span");badge.className="verified-badge";badge.textContent="✓ Verified";name.appendChild(badge);}
+  if(currentUser.id==="ea3645fa-9e94-4f39-989b-62b1e849db25"){
+   const revoke=document.createElement("button");revoke.className="light-button";revoke.textContent="Remove Verified Badge";revoke.onclick=()=>revokeVerification(otherId);info.appendChild(revoke);
+  }
 
   const details=document.createElement("p");
   details.textContent=(person.age?person.age+" years old":"")
