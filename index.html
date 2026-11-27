@@ -97,6 +97,22 @@ small{color:#777}
 .profile-details p{margin:8px 0}
 .verified-badge{display:inline-flex;align-items:center;gap:4px;margin-left:7px;padding:3px 8px;border-radius:20px;background:#e7f2ff;color:#1769c2;font-size:12px;font-weight:700;vertical-align:middle}
 .discover-name .verified-badge{margin-left:9px;padding:5px 10px;border:1px solid rgba(255,255,255,.75);border-radius:999px;background:linear-gradient(135deg,#16a6d8,#3157d5);color:#fff;font-size:11px;font-weight:800;letter-spacing:.5px;box-shadow:0 3px 12px rgba(20,95,190,.35);text-shadow:0 1px 1px rgba(0,0,0,.15)}
+.explore-tabs{display:flex;gap:6px;padding:5px;background:#f0ebf8;border-radius:16px;margin:8px 0 15px}
+.explore-tabs button{flex:1;width:auto;margin:0;padding:11px 5px;border-radius:12px;background:transparent;color:#6e6082;font-size:13px;font-weight:700}
+.explore-tabs button.active{background:#fff;color:#6121a6;box-shadow:0 2px 8px #2e145b18}
+.rooms-preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.room-tile{min-height:120px;border-radius:18px;padding:14px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 5px 14px #24113a20}
+.room-tile .room-emoji{font-size:29px}
+.room-tile strong{font-size:15px;line-height:1.2}
+.room-tile small{color:#fff;opacity:.9;font-size:11px}
+.room-love{background:linear-gradient(145deg,#ff4d9b,#c51b70)}
+.room-cruise{background:linear-gradient(145deg,#ffbd35,#f06b19)}
+.room-midnight{background:linear-gradient(145deg,#8245f5,#39128f)}
+.room-friends{background:linear-gradient(145deg,#35c985,#087c69)}
+.room-music{background:linear-gradient(145deg,#26b8ee,#2461d8)}
+.room-location{padding:12px;border-radius:14px;background:#f4effb;color:#56358a;font-weight:700;font-size:14px}
+.room-note{padding:12px;border-radius:14px;background:#faf8fd;color:#766b83;font-size:12px;line-height:1.5}
+
 .verification-panel{margin-top:14px;padding:13px;border:1px solid #dce8f8;border-radius:12px;background:#f8fbff}
 .verification-request{padding:12px;margin:9px 0;border:1px solid #eee;border-radius:12px;background:#fff}
 .my-small-photo{
@@ -263,7 +279,25 @@ style="display:none" alt="My profile picture">
 
 <!-- DISCOVER -->
 <div class="card" id="discoverCard">
-<div class="discover-heading">
+<div class="explore-tabs" aria-label="Explore LoveConnect">
+<button id="exploreDiscover" class="active" onclick="setExploreTab('discover')">Singles</button>
+<button id="exploreRooms" onclick="setExploreTab('rooms')">Vibe Rooms</button>
+<button id="exploreNearby" onclick="setExploreTab('nearby')">Nearby</button>
+</div>
+<div id="roomsPreview" style="display:none">
+<h2>✨ Your Local Vibe Rooms</h2>
+<div class="room-location" id="roomLocationLabel">📍 Loading your location...</div>
+<p>Meet and chat with people from your own city or state.</p>
+<div class="rooms-preview">
+<div class="room-tile room-love"><span class="room-emoji">💘</span><strong>Looking for Love</strong><small>Local members only</small></div>
+<div class="room-tile room-cruise"><span class="room-emoji">😂</span><strong>Cruise and Laughter</strong><small>Local members only</small></div>
+<div class="room-tile room-midnight"><span class="room-emoji">🌙</span><strong>Midnight Conversations</strong><small>Local members only</small></div>
+<div class="room-tile room-friends"><span class="room-emoji">🫂</span><strong>New Friends</strong><small>Local members only</small></div>
+<div class="room-tile room-music"><span class="room-emoji">🎵</span><strong>Music Lovers</strong><small>Local members only</small></div>
+</div>
+<div class="room-note">🔒 These rooms are reserved for members whose saved profile location matches yours. We'll enforce this on the server when we connect live room chat.</div>
+</div>
+<div id="singlesExplore"><div class="discover-heading">
 <h2>❤️ Discover Singles</h2>
 <button class="discover-search-button" id="toggleSearchButton" onclick="toggleDiscoverSearch()" aria-label="Open filters" title="Filters" aria-expanded="false">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="white"/><circle cx="15" cy="12" r="2" fill="white"/><circle cx="8" cy="18" r="2" fill="white"/></svg>
@@ -296,6 +330,7 @@ style="display:none" alt="My profile picture">
 
 <div id="undoArea" style="display:none">
 <button class="undo-button" onclick="undoDislike()">↩️ Undo Last Dislike</button>
+</div>
 </div>
 </div>
 
@@ -362,6 +397,35 @@ function getDisliked(){
 
 function saveDisliked(ids){
  localStorage.setItem(dislikedKey(),JSON.stringify(ids));
+}
+
+async function setExploreTab(tab){
+ const rooms=tab==="rooms";
+ const nearby=tab==="nearby";
+ document.getElementById("roomsPreview").style.display=rooms?"block":"none";
+ document.getElementById("singlesExplore").style.display=rooms?"none":"block";
+ ["discover","rooms","nearby"].forEach(name=>{
+  const button=document.getElementById("explore"+name.charAt(0).toUpperCase()+name.slice(1));
+  if(button)button.classList.toggle("active",name===tab);
+ });
+ if(rooms){
+  const label=document.getElementById("roomLocationLabel");
+  const {data:profile,error}=await db.from("profiles").select("location").eq("id",currentUser.id).maybeSingle();
+  if(error||!profile?.location){
+   label.textContent="📍 Add your city or state in Edit Profile to see your local rooms.";
+  }else{
+   label.textContent="📍 "+profile.location+" Vibe Rooms";
+  }
+ }
+ if(nearby){
+  document.getElementById("filterPanel").style.display="block";
+  document.getElementById("filterLocation").placeholder="Enter your city or state";
+  document.querySelector("#discoverCard .discover-heading h2").textContent="📍 People Near You";
+ }else{
+  document.getElementById("filterLocation").placeholder="Search city or country";
+  document.querySelector("#discoverCard .discover-heading h2").textContent="❤️ Discover Singles";
+  if(tab==="discover")document.getElementById("filterPanel").style.display="none";
+ }
 }
 
 function showOnly(section){
