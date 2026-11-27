@@ -184,6 +184,85 @@ small{color:#777}
 .compact-like-info{flex:1;min-width:0}
 .compact-like-info h3{margin:0 0 5px}
 .compact-like-info p{margin:0;color:#777;font-size:13px}
+
+
+
+/* LOVEConnect purple social redesign */
+:root{--lc-purple:#351078;--lc-purple2:#5a18c9;--lc-pink:#f02d91;--lc-ink:#21143d;--lc-muted:#766d88}
+html{background:#f7f5fc}
+body{background:#f7f5fc;color:var(--lc-ink);font-family:Arial,Helvetica,sans-serif;padding-bottom:82px}
+header{
+ background:linear-gradient(135deg,#24105e 0%,#42118f 58%,#6415bd 100%);
+ color:#fff;padding:20px 16px 22px;text-align:left;
+ box-shadow:0 5px 18px #26105a35;position:relative
+}
+header h1{font-size:27px;letter-spacing:-.5px;margin:0;display:flex;align-items:center;gap:9px}
+header h1:before{content:"";display:inline-block;width:34px;height:34px;background:linear-gradient(135deg,#ff8fc4,#f1268d);clip-path:polygon(50% 90%,12% 54%,5% 38%,8% 20%,22% 10%,38% 12%,50% 28%,62% 12%,78% 10%,92% 20%,95% 38%,88% 54%);filter:drop-shadow(0 3px 4px #0005)}
+header p{margin:6px 0 0 43px;color:#eee3ff;font-size:13px}
+main{max-width:620px;margin:0 auto;padding:12px 12px 24px}
+.card{background:#fff;padding:16px;border-radius:19px;box-shadow:0 4px 18px #35107812;margin-bottom:13px}
+h2{color:var(--lc-ink);font-size:21px}
+h3{color:var(--lc-ink)}
+button{background:linear-gradient(135deg,#7b22e8,#4a10b5);border-radius:13px;font-weight:700}
+button:active{transform:scale(.98)}
+.secondary{background:#5b5368}
+.light-button{background:#f1e8ff;color:#5b20b7}
+input,select,textarea{border:1px solid #e5dff0;border-radius:13px;background:#fff}
+.explore-tabs{display:flex;gap:5px;padding:5px;background:#eee7ff;border-radius:30px;margin:0 0 15px}
+.explore-tabs button{flex:1;width:auto;margin:0;padding:11px 5px;border-radius:25px;background:transparent;color:#4e3b73;font-size:14px}
+.explore-tabs button.active{background:#fff;color:#28104f;box-shadow:0 2px 9px #35107820}
+#roomsPreview>h2{margin:5px 0 8px;font-size:22px}
+.room-location{font-size:13px;color:#6b5b82;font-weight:700;margin:5px 0 9px}
+#roomsPreview>p{font-size:13px;color:var(--lc-muted);line-height:1.45}
+#vibeRoomList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+#vibeRoomList .room-tile{
+ min-height:150px;border-radius:17px;padding:15px 12px;color:#fff;
+ display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;
+ box-shadow:0 5px 12px #2c105326;overflow:hidden;position:relative
+}
+#vibeRoomList .room-tile:nth-child(1){background:linear-gradient(145deg,#ff70bc,#d80d75)}
+#vibeRoomList .room-tile:nth-child(2){background:linear-gradient(145deg,#ffc34b,#ef650c)}
+#vibeRoomList .room-tile:nth-child(3){background:linear-gradient(145deg,#8952f3,#3510a0)}
+#vibeRoomList .room-tile:nth-child(4){background:linear-gradient(145deg,#50d994,#087b55)}
+#vibeRoomList .room-tile:nth-child(5){background:linear-gradient(145deg,#39c9ed,#1551c6)}
+#vibeRoomList .room-tile:before{content:"";position:absolute;width:115px;height:115px;border-radius:50%;background:#ffffff20;top:-32px;right:-28px}
+#vibeRoomList .room-tile strong{font-size:17px;position:relative;z-index:1}
+#vibeRoomList .room-tile small{font-size:11px;color:#fff;opacity:.9;margin-top:5px;position:relative;z-index:1}
+#vibeRoomList .room-tile button{background:#fff;color:#4b16a5;padding:8px 12px;margin-top:10px;font-size:12px;position:relative;z-index:1}
+#vibeRoomList .empty{grid-column:1/-1}
+#vibeRoomChat{background:#fff;border-radius:16px}
+#vibeRoomMessages{background:#f7f4fc;border-radius:14px;min-height:180px}
+#vibeRoomMessages>div{max-width:88%;box-shadow:0 2px 6px #20103a12}
+.discover-card{border-radius:20px;height:calc(100dvh - 300px);min-height:420px;box-shadow:0 5px 20px #2c12501c}
+.discover-card img{border-radius:20px}
+.discover-card .discover-name{bottom:100px}
+.discover-card .discover-info{bottom:70px}
+.discover-actions button{width:66px;height:60px}
+#appNav{
+ position:fixed;z-index:1000;left:0;right:0;bottom:0;
+ display:flex;justify-content:space-around;align-items:center;
+ padding:7px 3px calc(7px + env(safe-area-inset-bottom));
+ background:#fff;border-top:1px solid #e9e2f2;box-shadow:0 -4px 18px #26104a12;
+}
+#appNav button{
+ flex:1;width:auto;min-width:0;margin:0;padding:4px 1px;
+ border-radius:10px;background:transparent;color:#756b89;
+ font-size:10px;line-height:1.35;font-weight:600;box-shadow:none
+}
+#appNav button.active{color:#d51c8b;background:#fff2fa}
+#appNav button:first-line{font-size:19px}
+#profileCard .profile-details{background:#faf8ff;border-radius:15px;padding:13px}
+#notificationCard .card{box-shadow:none;border:1px solid #eee8f6}
+@media(min-width:600px){
+ header{padding-left:max(18px,calc((100% - 590px)/2))}
+ #appNav{left:50%;right:auto;transform:translateX(-50%);width:min(100%,620px);border-radius:18px 18px 0 0}
+}
+@media(max-width:380px){
+ #vibeRoomList{gap:8px}
+ #vibeRoomList .room-tile{min-height:135px;padding:12px 9px}
+ #vibeRoomList .room-tile strong{font-size:15px}
+}
+
 </style>
 </head>
 
@@ -357,8 +436,9 @@ style="display:none" alt="My profile picture">
 </main>
 
 <nav id="appNav" style="display:none">
-<button id="navDiscover" onclick="showDiscover()">❤️<br>Discover</button>
-<button id="navLikes" onclick="loadLikes()">💌<br>Likes</button>
+<button id="navDiscover" onclick="showDiscover()">🏠<br>Discover</button>
+<button id="navRooms" onclick="showRoomsNav()">💬<br>Rooms</button>
+<button id="navLikes" onclick="loadLikes()">♡<br>Likes</button>
 <button id="navMatches" onclick="loadMatches()">💕<br>Matches</button>
 <button id="navNotifications" onclick="loadNotifications()">🔔<br>Alerts</button>
 <button id="navProfile" onclick="showMyProfile()">👤<br>Profile</button>
@@ -1044,6 +1124,12 @@ function clearFilters(){
  document.getElementById("filterGender").value="";
  document.getElementById("filterLocation").value="";
  loadDiscover();
+}
+
+function showRoomsNav(){
+ showOnly("discoverCard");
+ setActiveNav("navRooms");
+ setExploreTab("rooms");
 }
 
 function showDiscover(){
