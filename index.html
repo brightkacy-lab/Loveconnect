@@ -532,10 +532,25 @@ async function loadAdminVerificationRequests(){
 }
 
 async function reviewVerificationRequest(requestId,status){
+ if(currentUser?.id!=="ea3645fa-9e94-4f39-989b-62b1e849db25")return;
  if(!confirm("Are you sure you want to "+(status==="approved"?"approve":"reject")+" this request?"))return;
+
+ let memberId=null;
+ if(status==="approved"){
+  const {data:request,error:requestError}=await db.from("verification_requests").select("user_id").eq("id",requestId).maybeSingle();
+  if(requestError||!request){alert("Could not find this verification request: "+(requestError?.message||"Request not found."));return;}
+  memberId=request.user_id;
+  const {error:badgeError}=await db.from("verified_members").insert({user_id:memberId});
+  if(badgeError){alert("Could not add the verified badge. The request has not been approved. Please check the verified_members table permissions.\n\n"+badgeError.message);return;}
+ }
+
  const {error}=await db.from("verification_requests").update({status,reviewed_at:new Date().toISOString(),reviewed_by:currentUser.id}).eq("id",requestId);
- if(error){alert("Review failed: "+error.message);return;}
- alert("Verification request "+status+".");await loadAdminVerificationRequests();
+ if(error){
+  if(status==="approved"&&memberId)await db.from("verified_members").delete().eq("user_id",memberId);
+  alert("Review failed: "+error.message);return;
+ }
+ alert(status==="approved"?"Member approved and verified successfully.":"Verification request rejected.");
+ await loadAdminVerificationRequests();
 }
 
 async function revokeVerification(userId){
