@@ -187,8 +187,8 @@ small{color:#777}
 
 
 
-/* LOVEConnect purple social redesign */
-:root{--lc-purple:#351078;--lc-purple2:#5a18c9;--lc-pink:#f02d91;--lc-ink:#21143d;--lc-muted:#766d88}
+/* LOVEConnect mature purple redesign */
+:root{--lc-purple:#24104f;--lc-purple2:#432080;--lc-ink:#211b2d;--lc-muted:#746d7d}
 html{background:#f7f5fc}
 body{background:#f7f5fc;color:var(--lc-ink);font-family:Arial,Helvetica,sans-serif;padding-bottom:82px}
 header{
@@ -263,13 +263,39 @@ input,select,textarea{border:1px solid #e5dff0;border-radius:13px;background:#ff
  #vibeRoomList .room-tile strong{font-size:15px}
 }
 
+
+
+/* Mature brand palette: no pink accents */
+header h1:before{
+ content:"LC";width:35px;height:35px;clip-path:none;border-radius:11px;
+ display:inline-flex;align-items:center;justify-content:center;
+ background:linear-gradient(145deg,#8c79b9,#493477);
+ color:#fff;font-size:13px;font-weight:800;filter:none
+}
+h2{color:#282236}
+button{background:linear-gradient(135deg,#59458a,#302052)}
+.light-button{background:#eeeaf4;color:#453765}
+.explore-tabs{background:#ebe8f1}
+.explore-tabs button{color:#625a70}
+.explore-tabs button.active{color:#282236;background:#fff}
+#vibeRoomList .room-tile:nth-child(1){background:linear-gradient(145deg,#6e5a9d,#35245e)}
+#vibeRoomList .room-tile:nth-child(2){background:linear-gradient(145deg,#9b8156,#5b4729)}
+#vibeRoomList .room-tile:nth-child(3){background:linear-gradient(145deg,#71628f,#352a55)}
+#vibeRoomList .room-tile:nth-child(4){background:linear-gradient(145deg,#568575,#285346)}
+#vibeRoomList .room-tile:nth-child(5){background:linear-gradient(145deg,#547f9a,#294d68)}
+#vibeRoomList .room-tile button{color:#30234d}
+#appNav button.active{color:#493477;background:#f0edf5}
+.discover-actions .like-action{background:#493477}
+.discover-actions .dislike-button{background:#615b68}
+.verified-badge{background:#e9f2ff;color:#1762a7}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>❤️ LoveConnect</h1>
+<h1>LoveConnect</h1>
 <p>Meet people. Make connections.</p>
 <button id="installAppBtn" class="light-button" style="display:none;max-width:230px;margin:12px auto 0" onclick="installLoveConnect()">⬇️ Install LoveConnect</button>
 <p id="installHelp" style="display:none;font-size:12px;margin:8px 0 0">To install, open your browser menu and choose Install app or Add to Home screen.</p>
